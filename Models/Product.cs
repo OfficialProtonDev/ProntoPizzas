@@ -13,7 +13,7 @@ namespace ProntoPizzas.Models
         [Display(Name = "Pizza Description")]
         public string? PizzaDescription { get; set; }
 
-        public List<string> Ingredients { get; set; } = new List<string>();
+        public string? Ingredients { get; set; }
 
         [Display(Name = "Image URL")]
         public string? ImageUrl { get; set; }
