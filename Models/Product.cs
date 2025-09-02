@@ -1,0 +1,23 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProntoPizzas.Models
+{
+    public class Product
+    {
+        [Display(Name = "Product ID")]
+        public Guid ProductId { get; set; }
+
+        [Display(Name = "Pizza Name")]
+        public string? PizzaName { get; set; }
+
+        [Display(Name = "Pizza Description")]
+        public string? PizzaDescription { get; set; }
+
+        public List<string> Ingredients { get; set; } = new List<string>();
+
+        [Display(Name = "Image URL")]
+        public string? ImageUrl { get; set; }
+        public decimal? Price { get; set; }
+        public int? Quantity { get; set; }
+    }
+}
