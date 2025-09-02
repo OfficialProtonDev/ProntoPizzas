@@ -1,38 +1,122 @@
-.App {
-  text-align: center;
+body {
+    background: #ffe5a3;
+    font-family: 'Fredoka One', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.home-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.home-header {
+    background: #e84c3d;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 2.5rem;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.logo {
+    font-size: 2.2rem;
+    font-weight: bold;
+    letter-spacing: 1px;
 }
 
-.App-link {
-  color: #61dafb;
+.home-header nav {
+    display: flex;
+    gap: 2rem;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    .home-header nav a {
+        color: #fff;
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 500;
+        transition: text-decoration 0.2s, color 0.2s;
+    }
+
+        .home-header nav a:hover {
+            text-decoration: underline;
+            color: #ffd700;
+        }
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+}
+
+h1 {
+    font-size: 2.7rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: #222;
+    text-align: center;
+}
+
+p {
+    font-size: 1.25rem;
+    color: #4a4a4a;
+    margin-bottom: 2rem;
+    text-align: center;
+    max-width: 600px;
+}
+
+.order-btn {
+    background: #26b24b;
+    color: #fff;
+    border: none;
+    padding: 1rem 2.2rem;
+    font-size: 1.2rem;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(38, 178, 75, 0.12);
+    margin-bottom: 2rem;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+    .order-btn:hover {
+        background: #20963f;
+        box-shadow: 0 4px 16px rgba(38, 178, 75, 0.18);
+    }
+
+.pizza-img {
+    display: block;
+    margin: 0 auto;
+    max-width: 340px;
+    width: 100%;
+    border-radius: 18px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+}
+
+@media (max-width: 700px) {
+    .home-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem 1.2rem;
+    }
+
+    .logo {
+        margin-bottom: 0.6rem;
+    }
+
+    main {
+        padding: 2rem 0.5rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .pizza-img {
+        max-width: 220px;
+    }
 }
