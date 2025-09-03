@@ -11,15 +11,17 @@ namespace ProntoPizzas.Models
         public DateTime? OrderDate { get; set; }
 
         [Display(Name = "Customer")]
-        public Guid CustomerId { get; set; }
-        public Customer? Customer { get; set; }
+        public Guid CustomerName { get; set; }
+        public string? Customer { get; set; }
+
+        [Display(Name = "Delivery Address")]
+        public string? DeliveryAddress { get; set; }
 
         [Display(Name = "Product")]
         public Guid ProductId { get; set; }
         public Product? Product { get; set; }
 
-        [Display(Name = "Staff")]
-        public Guid StaffId { get; set; }
-        public Staff? Staff { get; set; }
+        [Display(Name = "Order Status")]
+        public string? OrderStatus { get; set; }
     }
 }
