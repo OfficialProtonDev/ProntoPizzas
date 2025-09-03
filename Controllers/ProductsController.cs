@@ -34,7 +34,7 @@ namespace ProntoPizzas.Controllers
             }
 
             var product = await _context.Product
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+                .FirstOrDefaultAsync(m => m.PizzaId == id);
             if (product == null)
             {
                 return NotFound();
@@ -58,7 +58,7 @@ namespace ProntoPizzas.Controllers
         {
             if (ModelState.IsValid)
             {
-                product.ProductId = Guid.NewGuid();
+                product.PizzaId = Guid.NewGuid();
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -89,7 +89,7 @@ namespace ProntoPizzas.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, [Bind("ProductId,PizzaName,PizzaDescription,Ingredients,ImageUrl,Price,Quantity")] Product product)
         {
-            if (id != product.ProductId)
+            if (id != product.PizzaId)
             {
                 return NotFound();
             }
@@ -103,7 +103,7 @@ namespace ProntoPizzas.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductExists(product.ProductId))
+                    if (!ProductExists(product.PizzaId))
                     {
                         return NotFound();
                     }
@@ -126,7 +126,7 @@ namespace ProntoPizzas.Controllers
             }
 
             var product = await _context.Product
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+                .FirstOrDefaultAsync(m => m.PizzaId == id);
             if (product == null)
             {
                 return NotFound();
@@ -152,7 +152,7 @@ namespace ProntoPizzas.Controllers
 
         private bool ProductExists(Guid id)
         {
-            return _context.Product.Any(e => e.ProductId == id);
-        }
+            return _context.Product.Any(e => e.PizzaId == id);
+        }   
     }
 }
