@@ -22,7 +22,7 @@ namespace ProntoPizzas.Controllers
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Order.Include(o => o.Customer).Include(o => o.Product).Include(o => o.Staff);
+            var applicationDbContext = _context.Order.Include(o => o.Product);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -35,9 +35,7 @@ namespace ProntoPizzas.Controllers
             }
 
             var order = await _context.Order
-                .Include(o => o.Customer)
                 .Include(o => o.Product)
-                .Include(o => o.Staff)
                 .FirstOrDefaultAsync(m => m.OrderId == id);
             if (order == null)
             {
@@ -50,9 +48,7 @@ namespace ProntoPizzas.Controllers
         // GET: Orders/Create
         public IActionResult Create()
         {
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId");
             ViewData["ProductId"] = new SelectList(_context.Set<Product>(), "ProductId", "ProductId");
-            ViewData["StaffId"] = new SelectList(_context.Set<Staff>(), "StaffId", "StaffId");
             return View();
         }
 
@@ -70,9 +66,7 @@ namespace ProntoPizzas.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId", order.CustomerId);
             ViewData["ProductId"] = new SelectList(_context.Set<Product>(), "ProductId", "ProductId", order.ProductId);
-            ViewData["StaffId"] = new SelectList(_context.Set<Staff>(), "StaffId", "StaffId", order.StaffId);
             return View(order);
         }
 
@@ -89,9 +83,7 @@ namespace ProntoPizzas.Controllers
             {
                 return NotFound();
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId", order.CustomerId);
             ViewData["ProductId"] = new SelectList(_context.Set<Product>(), "ProductId", "ProductId", order.ProductId);
-            ViewData["StaffId"] = new SelectList(_context.Set<Staff>(), "StaffId", "StaffId", order.StaffId);
             return View(order);
         }
 
@@ -127,9 +119,7 @@ namespace ProntoPizzas.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerId", order.CustomerId);
             ViewData["ProductId"] = new SelectList(_context.Set<Product>(), "ProductId", "ProductId", order.ProductId);
-            ViewData["StaffId"] = new SelectList(_context.Set<Staff>(), "StaffId", "StaffId", order.StaffId);
             return View(order);
         }
 
@@ -142,9 +132,7 @@ namespace ProntoPizzas.Controllers
             }
 
             var order = await _context.Order
-                .Include(o => o.Customer)
                 .Include(o => o.Product)
-                .Include(o => o.Staff)
                 .FirstOrDefaultAsync(m => m.OrderId == id);
             if (order == null)
             {
