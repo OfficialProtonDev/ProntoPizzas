@@ -17,8 +17,8 @@ namespace ProntoPizzas.Models
         [Display(Name = "Delivery Address")]
         public string? DeliveryAddress { get; set; }
 
-        [Display(Name = "Product")]
-        public Guid ProductId { get; set; }
+        [Display(Name = "Pizza")]
+        public Guid PizzaId { get; set; }
         public Product? Product { get; set; }
 
         [Display(Name = "Order Status")]

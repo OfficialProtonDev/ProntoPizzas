@@ -48,7 +48,7 @@ namespace ProntoPizzas.Controllers
         // GET: Orders/Create
         public IActionResult Create()
         {
-            ViewData["ProductId"] = new SelectList(_context.Set<Product>(), "ProductId", "ProductId");
+            ViewData["PizzaId"] = new SelectList(_context.Set<Product>(), "PizzaId", "PizzaName");
             return View();
         }
 
@@ -66,7 +66,7 @@ namespace ProntoPizzas.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductId"] = new SelectList(_context.Set<Product>(), "ProductId", "ProductId", order.ProductId);
+            ViewData["PizzaId"] = new SelectList(_context.Set<Product>(), "PizzaId", "PizzaId", order.PizzaId);
             return View(order);
         }
 
@@ -83,7 +83,7 @@ namespace ProntoPizzas.Controllers
             {
                 return NotFound();
             }
-            ViewData["ProductId"] = new SelectList(_context.Set<Product>(), "ProductId", "ProductId", order.ProductId);
+            ViewData["PizzaId"] = new SelectList(_context.Set<Product>(), "PizzaId", "PizzaName", order.PizzaId);
             return View(order);
         }
 
@@ -92,7 +92,7 @@ namespace ProntoPizzas.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("OrderId,OrderDate,CustomerId,ProductId,StaffId")] Order order)
+        public async Task<IActionResult> Edit(Guid id, [Bind("OrderId,OrderDate,CustomerId,PizzaId,StaffId")] Order order)
         {
             if (id != order.OrderId)
             {
@@ -119,7 +119,7 @@ namespace ProntoPizzas.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductId"] = new SelectList(_context.Set<Product>(), "ProductId", "ProductId", order.ProductId);
+            ViewData["PizzaId"] = new SelectList(_context.Set<Product>(), "PizzaId", "PizzaId", order.PizzaId);
             return View(order);
         }
 
