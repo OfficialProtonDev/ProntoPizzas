@@ -1,26 +1,78 @@
 import React from 'react';
-import './App.css'; 
+import './App.css';
+
+const featuredMenu = [
+    {
+        name: "Margherita",
+        description: "Fresh basil, mozzarella & tomato sauce",
+        price: "$16",
+        img: "/pizza1.png"
+    },
+    {
+        name: "Pepperoni",
+        description: "Double pepperoni & mozzarella",
+        price: "$18",
+        img: "/pizza1.png"
+    },
+    {
+        name: "Veggie Supreme",
+        description: "Peppers, onions, olives & mushrooms",
+        price: "$17",
+        img: "/pizza1.png"
+    }
+];
 
 export default function Home() {
     return (
-        // Header section with navigation links
         <div className="home-container">
             <header className="home-header">
-                <div className="logo">Pronto Pizzas</div>
-                <nav>
-                    <a href="/menu" >Menu</a>
-                    <a href="/order" >Order</a>
-                    <a href="/login" >Login</a>
-                    <a href="/signup" >Sign Up</a>
-                </nav>
+                <div className="header-left">
+                    <div className="logo">
+                        Pronto Pizzas
+                        <span className="shop-tagline">Authentic. Fresh. Fast.</span>
+                    </div>
+                    <nav className="nav-links">
+                        <a href="/menu">Menu</a>
+                        <a href="/order">Order</a>
+                        <a href="/tracking">Tracking</a>
+                    </nav>
+                </div>
             </header>
-            {/* Main section with promotional content */}
-            <main>
-                <h1>Freshly Hot cooked Pizzas</h1>
-                <p>Delicious pizzas made with the freshest ingredients, delivered pronto to your door.</p>
-                <button className="order-btn" >Order Now</button>
-                <img src="/pizza1.png" alt="Pizza" className="pizza-img" />
+            <main className="main-hero">
+                <section className="hero-content">
+                    <h1>Freshly Hot cooked Pizzas</h1>
+                    <p>Delicious pizzas made with the freshest ingredients, delivered pronto to your door.</p>
+                    <button className="order-btn">Order Now</button>
+                </section>
+                <div className="pizza-img-wrapper">
+                    <img src="/pizza1.png" alt="Pizza" className="pizza-img" />
+                </div>
             </main>
+
+            <div className="curve-divider">
+                <svg viewBox="0 0 1440 80" width="100%" height="80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#f6d581" d="M0,30 Q720,80 1440,30 L1440,80 L0,80 Z" />
+                </svg>
+            </div>
+
+            <section className="featured-menu">
+                <h2>Featured Menu</h2>
+                <div className="menu-grid">
+                    {featuredMenu.map((item) => (
+                        <div className="menu-card" key={item.name}>
+                            <img src={item.img} alt={item.name} className="menu-img" />
+                            <div className="menu-details">
+                                <h3>{item.name}</h3>
+                                <p>{item.description}</p>
+                                <div className="menu-bottom">
+                                    <span className="menu-price">{item.price}</span>
+                                    <button className="menu-order-btn">Order</button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
         </div>
     );
 }
