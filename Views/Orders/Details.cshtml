@@ -17,22 +17,28 @@
             @Html.DisplayFor(model => model.OrderDate)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Customer)
+            @Html.DisplayNameFor(model => model.CustomerName)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Customer.CustomerId)
+            @Html.DisplayFor(model => model.CustomerName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DeliveryAddress)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DeliveryAddress)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Product)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Product.ProductId)
+            @Html.DisplayFor(model => model.Product.PizzaId)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Staff)
+            @Html.DisplayNameFor(model => model.OrderStatus)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Staff.StaffId)
+            @Html.DisplayFor(model => model.OrderStatus)
         </dd>
     </dl>
 </div>

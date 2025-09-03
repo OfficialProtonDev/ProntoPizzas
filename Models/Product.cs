@@ -4,8 +4,9 @@ namespace ProntoPizzas.Models
 {
     public class Product
     {
-        [Display(Name = "Product ID")]
-        public Guid ProductId { get; set; }
+        [Key]
+        [Display(Name = "Pizza ID")]
+        public Guid PizzaId { get; set; }
 
         [Display(Name = "Pizza Name")]
         public string? PizzaName { get; set; }

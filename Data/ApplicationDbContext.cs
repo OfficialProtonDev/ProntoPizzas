@@ -10,9 +10,7 @@ namespace ProntoPizzas.Data
             : base(options)
         {
         }
-        public DbSet<ProntoPizzas.Models.Customer> Customer { get; set; } = default!;
         public DbSet<ProntoPizzas.Models.Order> Order { get; set; } = default!;
         public DbSet<ProntoPizzas.Models.Product> Product { get; set; } = default!;
-        public DbSet<ProntoPizzas.Models.Staff> Staff { get; set; } = default!;
     }
 }
