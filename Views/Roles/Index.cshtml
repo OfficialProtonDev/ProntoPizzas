@@ -15,7 +15,7 @@
 			<ul class="list-group">
 				@foreach (var role in Model.Roles)
 				{
-					<li class="list-group-item d-flex justify-content-between align-items-center">
+					<li class="list-group-item d-flex justify-content-between align-items-center role-list">
 						<span>
 							<i class="bi bi-person-badge"></i> @role.Name
 						</span>
@@ -38,7 +38,7 @@
 		<h2>Users and Their Roles</h2>
 		@if (Model.UserRoles.Any())
 		{
-			<div class="table-responsive">
+			<div class="table-responsive custom-table">
 				<table class="table table-striped table-hover">
 					<thead class="table-dark">
 						<tr>
