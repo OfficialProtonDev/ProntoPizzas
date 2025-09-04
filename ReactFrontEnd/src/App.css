@@ -4,6 +4,13 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+html {
+    width: 100%;
+    overflow-x: hidden;
 }
 
 .home-container {
@@ -13,6 +20,8 @@ body {
     flex-direction: column;
     margin: 0;
     padding: 0;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 /* Header styles */
@@ -78,7 +87,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding-top: 4rem;
-    padding-bottom: 2.5rem;
+    padding-bottom: 4rem; 
 }
 
 .hero-content {
@@ -148,16 +157,6 @@ body {
     display: block;
 }
 
-/* Curve Divider Section Transition */
-.curve-divider {
-    display: block;
-    width: 100%;
-    margin: 0;
-    line-height: 0;
-    z-index: 1;
-    position: relative;
-}
-
 /* Featured Menu Section */
 .featured-menu {
     width: 100%;
@@ -172,6 +171,28 @@ body {
     z-index: 2;
     border-radius: 0;
 }
+
+    .featured-menu .curve-divider {
+        position: absolute;
+        top: -70px; 
+        left: 0;
+        width: 100%;
+        height: 80px;
+        line-height: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+        .featured-menu .curve-divider svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+           
+        }
+
+        .featured-menu .curve-divider path {
+            fill: #f6d581;
+        }
 
     .featured-menu h2 {
         font-size: 2.3rem;
@@ -268,42 +289,54 @@ body {
         box-shadow: 0 4px 16px rgba(230,57,70,0.19);
     }
 
-
+/* Responsive adjustments */
 @media (max-width: 1100px) {
     .main-hero {
-        max-width: 98vw;
-        gap: 2rem;
-        flex-direction: column;
-        padding-top: 2rem;
+        padding-bottom: 3rem;
     }
 
-    .featured-menu {
-        padding: 2rem 0 2.7rem 0;
-    }
-
-    .menu-grid {
-        flex-direction: column;
-        gap: 1.5rem;
-        align-items: center;
-        width: 100%;
-    }
-
-    .curve-divider {
-        max-width: 100%;
+    .featured-menu .curve-divider {
+        top: -65px;
+        height: 72px;
     }
 }
 
 @media (max-width: 700px) {
     .main-hero {
+        flex-direction: column;
         padding: 1rem 0.4rem;
+        padding-bottom: 4rem; 
     }
 
     .featured-menu {
-        padding: 1rem 0 1.2rem 0;
+        margin-top: 2rem; 
+        padding: 1.2rem 0 1.2rem 0; 
     }
+
+        .featured-menu .curve-divider {
+            top: -45px;
+            height: 56px;
+        }
 
     .menu-grid {
         flex-direction: column;
-        gap: 1.2rem;
+        gap: 2rem; 
+        align-items: center;
+        padding: 0 1rem; 
+    }
+
+    .menu-card {
+        min-width: unset;
+        max-width: 320px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 1.3rem 0.8rem 1.2rem 0.8rem; 
+        border-radius: 18px;
+    }
+
+    .menu-img {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 1rem;
     }
 }

@@ -49,13 +49,12 @@ export default function Home() {
                 </div>
             </main>
 
-            <div className="curve-divider">
-                <svg viewBox="0 0 1440 80" width="100%" height="80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="#f6d581" d="M0,30 Q720,80 1440,30 L1440,80 L0,80 Z" />
-                </svg>
-            </div>
-
             <section className="featured-menu">
+                <div className="curve-divider" aria-hidden="true">
+                    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0,30 Q720,80 1440,30 L1440,80 L0,80 Z" />
+                    </svg>
+                </div>
                 <h2>Featured Menu</h2>
                 <div className="menu-grid">
                     {featuredMenu.map((item) => (
