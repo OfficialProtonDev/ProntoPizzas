@@ -16,13 +16,13 @@
                 @Html.DisplayNameFor(model => model.OrderDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Customer)
+                @Html.DisplayNameFor(model => model.CustomerName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.DeliveryAddress)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Product)
+                Products
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.OrderStatus)
@@ -43,7 +43,7 @@
                 @Html.DisplayFor(modelItem => item.DeliveryAddress)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Product.PizzaName)
+                @string.Join(", ", item.OrderProducts.Select(op => op.Product.PizzaName))
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.OrderStatus)

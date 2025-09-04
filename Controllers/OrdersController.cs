@@ -22,8 +22,11 @@ namespace ProntoPizzas.Controllers
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Order.Include(o => o.Product);
-            return View(await applicationDbContext.ToListAsync());
+            var orders = await _context.Order
+                .Include(o => o.OrderProducts)
+                    .ThenInclude(op => op.Product)
+                .ToListAsync();
+            return View(orders);
         }
 
         // GET: Orders/Details/5
@@ -35,7 +38,8 @@ namespace ProntoPizzas.Controllers
             }
 
             var order = await _context.Order
-                .Include(o => o.Product)
+                .Include(o => o.OrderProducts)
+                    .ThenInclude(op => op.Product)
                 .FirstOrDefaultAsync(m => m.OrderId == id);
             if (order == null)
             {
@@ -48,25 +52,24 @@ namespace ProntoPizzas.Controllers
         // GET: Orders/Create
         public IActionResult Create()
         {
-            ViewData["PizzaId"] = new SelectList(_context.Set<Product>(), "PizzaId", "PizzaName");
+            var products = _context.Product.ToList();
+            ViewBag.Products = products;
             return View();
         }
 
         // POST: Orders/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderId,OrderDate,CustomerId,ProductId,StaffId")] Order order)
+        public async Task<IActionResult> Create([Bind("OrderId,OrderDate,CustomerName,DeliveryAddress,OrderStatus")] Order order, List<OrderProduct> OrderProducts)
         {
             if (ModelState.IsValid)
             {
                 order.OrderId = Guid.NewGuid();
+                order.OrderProducts = OrderProducts.Where(op => op.Quantity > 0).ToList();
                 _context.Add(order);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PizzaId"] = new SelectList(_context.Set<Product>(), "PizzaId", "PizzaId", order.PizzaId);
             return View(order);
         }
 
@@ -78,21 +81,23 @@ namespace ProntoPizzas.Controllers
                 return NotFound();
             }
 
-            var order = await _context.Order.FindAsync(id);
+            var order = await _context.Order
+                .Include(o => o.OrderProducts)
+                .FirstOrDefaultAsync(o => o.OrderId == id);
             if (order == null)
             {
                 return NotFound();
             }
-            ViewData["PizzaId"] = new SelectList(_context.Set<Product>(), "PizzaId", "PizzaName", order.PizzaId);
+
+            var selectedProducts = order.OrderProducts.Select(op => op.PizzaId).ToArray();
+            ViewData["Products"] = new MultiSelectList(_context.Product, "PizzaId", "PizzaName", selectedProducts);
             return View(order);
         }
 
         // POST: Orders/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("OrderId,OrderDate,CustomerId,PizzaId,StaffId")] Order order)
+        public async Task<IActionResult> Edit(Guid id, [Bind("OrderId,OrderDate,CustomerName,DeliveryAddress,OrderStatus")] Order order, Guid[] selectedProducts)
         {
             if (id != order.OrderId)
             {
@@ -103,8 +108,28 @@ namespace ProntoPizzas.Controllers
             {
                 try
                 {
+                    // Update order basic info
                     _context.Update(order);
-                    await _context.SaveChangesAsync();
+
+                    // Update products
+                    var existingOrder = await _context.Order
+                        .Include(o => o.OrderProducts)
+                        .FirstOrDefaultAsync(o => o.OrderId == id);
+
+                    if (existingOrder != null)
+                    {
+                        // Remove old products
+                        _context.RemoveRange(existingOrder.OrderProducts);
+
+                        // Add new products
+                        existingOrder.OrderProducts = selectedProducts.Select(pid => new OrderProduct
+                        {
+                            OrderId = id,
+                            PizzaId = pid
+                        }).ToList();
+
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -119,7 +144,7 @@ namespace ProntoPizzas.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PizzaId"] = new SelectList(_context.Set<Product>(), "PizzaId", "PizzaId", order.PizzaId);
+            ViewData["Products"] = new MultiSelectList(_context.Product, "PizzaId", "PizzaName", selectedProducts);
             return View(order);
         }
 
@@ -132,7 +157,8 @@ namespace ProntoPizzas.Controllers
             }
 
             var order = await _context.Order
-                .Include(o => o.Product)
+                .Include(o => o.OrderProducts)
+                    .ThenInclude(op => op.Product)
                 .FirstOrDefaultAsync(m => m.OrderId == id);
             if (order == null)
             {
@@ -147,9 +173,13 @@ namespace ProntoPizzas.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var order = await _context.Order.FindAsync(id);
+            var order = await _context.Order
+                .Include(o => o.OrderProducts)
+                .FirstOrDefaultAsync(o => o.OrderId == id);
+
             if (order != null)
             {
+                _context.Set<OrderProduct>().RemoveRange(order.OrderProducts);
                 _context.Order.Remove(order);
             }
 

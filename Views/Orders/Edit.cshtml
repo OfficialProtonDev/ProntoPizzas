@@ -20,22 +20,21 @@
             </div>
             <div class="form-group">
                 <label asp-for="CustomerName" class="control-label"></label>
-                <select asp-for="CustomerName" class="form-control" asp-items="ViewBag.CustomerName"></select>
+                <input asp-for="CustomerName" class="form-control" />
                 <span asp-validation-for="CustomerName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DeliveryAddress" class="control-label"></label>
-                <select asp-for="DeliveryAddress" class="form-control" asp-items="ViewBag.DeliveryAddress"></select>
+                <input asp-for="DeliveryAddress" class="form-control" />
                 <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PizzaId" class="control-label"></label>
-                <select asp-for="PizzaId" class="form-control" asp-items="ViewBag.PizzaId"></select>
-                <span asp-validation-for="PizzaId" class="text-danger"></span>
+                <label for="selectedProducts" class="control-label">Products</label>
+                <select id="selectedProducts" name="selectedProducts" class="form-control" multiple="multiple" asp-items="ViewBag.Products"></select>
             </div>
             <div class="form-group">
                 <label asp-for="OrderStatus" class="control-label"></label>
-                <select asp-for="OrderStatus" class="form-control" asp-items="ViewBag.OrderStatus"></select>
+                <input asp-for="OrderStatus" class="form-control" />
                 <span asp-validation-for="OrderStatus" class="text-danger"></span>
             </div>
             <div class="form-group">
