@@ -28,6 +28,10 @@ body {
     color: white;
 }
 
+.page-title {
+    margin-top: 100px;
+}
+
 .custom-table {
     background-color: #0b0b0baa;
     color: #fff !important;
@@ -80,6 +84,15 @@ body {
 
 .light-link:hover {
     color: steelblue;
+}
+
+.action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 3rem;
+    width: 3rem;
+    font-size: 1.5rem;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
