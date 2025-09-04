@@ -33,7 +33,7 @@
             <ul>
                 @foreach (var op in Model.OrderProducts)
                 {
-                    <li>@op.Product.PizzaName</li>
+                    <li>@op.Product.PizzaName (@op.Quantity)</li>
                 }
             </ul>
         </dd>
@@ -46,6 +46,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.OrderId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a class="crud-link" asp-action="Edit" asp-route-id="@Model?.OrderId">Edit</a> |
+    <a class="crud-link" asp-action="Index">Back to List</a>
 </div>

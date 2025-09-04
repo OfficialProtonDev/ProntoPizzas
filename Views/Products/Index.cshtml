@@ -7,9 +7,9 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="crud-link" asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table class="table custom-table">
     <thead>
         <tr>
             <th>
@@ -49,9 +49,9 @@
                 @Html.DisplayFor(modelItem => item.Price)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.PizzaId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.PizzaId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.PizzaId">Delete</a>
+                <a class="crud-link" asp-action="Edit" asp-route-id="@item.PizzaId">Edit</a> |
+                <a class="crud-link" asp-action="Details" asp-route-id="@item.PizzaId">Details</a> |
+                <a class="crud-link" asp-action="Delete" asp-route-id="@item.PizzaId">Delete</a>
             </td>
         </tr>
 }

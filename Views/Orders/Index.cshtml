@@ -7,9 +7,9 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="crud-link" asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table class="table custom-table">
     <thead>
         <tr>
             <th>
@@ -42,16 +42,21 @@
             <td>
                 @Html.DisplayFor(modelItem => item.DeliveryAddress)
             </td>
-            <td>
-                @string.Join(", ", item.OrderProducts.Select(op => op.Product.PizzaName))
-            </td>
+                <td>
+                    <ul>
+                        @foreach (var op in item.OrderProducts)
+                        {
+                            <li>@op.Product.PizzaName (@op.Quantity)</li>
+                        }
+                    </ul>
+                </td>
             <td>
                 @Html.DisplayFor(modelItem => item.OrderStatus)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.OrderId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.OrderId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.OrderId">Delete</a>
+                <a class="crud-link" asp-action="Edit" asp-route-id="@item.OrderId">Edit</a> |
+                <a class="crud-link" asp-action="Details" asp-route-id="@item.OrderId">Details</a> |
+                <a class="crud-link" asp-action="Delete" asp-route-id="@item.OrderId">Delete</a>
             </td>
         </tr>
 }

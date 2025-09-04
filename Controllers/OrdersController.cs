@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProntoPizzas.Data;
@@ -52,100 +48,139 @@ namespace ProntoPizzas.Controllers
         // GET: Orders/Create
         public IActionResult Create()
         {
-            var products = _context.Product.ToList();
-            ViewBag.Products = products;
-            return View();
+            var viewModel = new OrderCreateViewModel
+            {
+                Products = _context.Product.ToList()
+            };
+            // Prepopulate OrderProducts for binding
+            viewModel.OrderProducts = viewModel.Products.Select(p => new OrderProduct { PizzaId = p.PizzaId, Quantity = 0 }).ToList();
+            return View(viewModel);
         }
 
         // POST: Orders/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderId,OrderDate,CustomerName,DeliveryAddress,OrderStatus")] Order order, List<OrderProduct> OrderProducts)
+        public async Task<IActionResult> Create(OrderCreateViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
-                order.OrderId = Guid.NewGuid();
-                order.OrderProducts = OrderProducts.Where(op => op.Quantity > 0).ToList();
-                _context.Add(order);
+                viewModel.Order.OrderId = Guid.NewGuid();
+                viewModel.Order.OrderProducts = viewModel.OrderProducts.Where(op => op.Quantity > 0).ToList();
+                _context.Add(viewModel.Order);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(order);
+            // Repopulate products and OrderProducts if validation fails
+            viewModel.Products = _context.Product.ToList();
+            if (viewModel.OrderProducts == null || viewModel.OrderProducts.Count == 0)
+            {
+                viewModel.OrderProducts = viewModel.Products.Select(p => new OrderProduct { PizzaId = p.PizzaId, Quantity = 0 }).ToList();
+            }
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .SelectMany(x => x.Value.Errors.Select(e => $"{x.Key}: {e.ErrorMessage}"))
+                    .ToList();
+
+                // Log errors to the output window
+                foreach (var error in errors)
+                {
+                    System.Diagnostics.Debug.WriteLine(error);
+                }
+
+                // Optionally, set a breakpoint here and inspect 'errors' in the debugger
+            }
+            return View(viewModel);
         }
 
         // GET: Orders/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var order = await _context.Order
                 .Include(o => o.OrderProducts)
                 .FirstOrDefaultAsync(o => o.OrderId == id);
-            if (order == null)
-            {
-                return NotFound();
-            }
 
-            var selectedProducts = order.OrderProducts.Select(op => op.PizzaId).ToArray();
-            ViewData["Products"] = new MultiSelectList(_context.Product, "PizzaId", "PizzaName", selectedProducts);
-            return View(order);
+            if (order == null)
+                return NotFound();
+
+            var products = await _context.Product.ToListAsync();
+
+            // Build OrderProducts for all products, using existing quantities or 0
+            var orderProducts = products
+                .Select(p =>
+                {
+                    var op = order.OrderProducts.FirstOrDefault(x => x.PizzaId == p.PizzaId);
+                    return new OrderProduct
+                    {
+                        PizzaId = p.PizzaId,
+                        Quantity = op?.Quantity ?? 0
+                    };
+                })
+                .ToList();
+
+            var viewModel = new OrderCreateViewModel
+            {
+                Order = order,
+                Products = products,
+                OrderProducts = orderProducts
+            };
+
+            return View(viewModel);
         }
 
         // POST: Orders/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("OrderId,OrderDate,CustomerName,DeliveryAddress,OrderStatus")] Order order, Guid[] selectedProducts)
+        public async Task<IActionResult> Edit(Guid id, OrderCreateViewModel viewModel)
         {
-            if (id != order.OrderId)
-            {
+            if (id != viewModel.Order.OrderId)
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    // Update order basic info
-                    _context.Update(order);
+                var order = await _context.Order
+                    .Include(o => o.OrderProducts)
+                    .FirstOrDefaultAsync(o => o.OrderId == id);
 
-                    // Update products
-                    var existingOrder = await _context.Order
-                        .Include(o => o.OrderProducts)
-                        .FirstOrDefaultAsync(o => o.OrderId == id);
+                if (order == null)
+                    return NotFound();
 
-                    if (existingOrder != null)
+                // Update order fields
+                order.OrderDate = viewModel.Order.OrderDate;
+                order.CustomerName = viewModel.Order.CustomerName;
+                order.DeliveryAddress = viewModel.Order.DeliveryAddress;
+                order.OrderStatus = viewModel.Order.OrderStatus;
+
+                // Remove old products
+                _context.OrderProduct.RemoveRange(order.OrderProducts);
+
+                // Add new products with quantity > 0
+                order.OrderProducts = viewModel.OrderProducts
+                    .Where(op => op.Quantity > 0)
+                    .Select(op => new OrderProduct
                     {
-                        // Remove old products
-                        _context.RemoveRange(existingOrder.OrderProducts);
+                        OrderId = order.OrderId,
+                        PizzaId = op.PizzaId,
+                        Quantity = op.Quantity
+                    })
+                    .ToList();
 
-                        // Add new products
-                        existingOrder.OrderProducts = selectedProducts.Select(pid => new OrderProduct
-                        {
-                            OrderId = id,
-                            PizzaId = pid
-                        }).ToList();
-
-                        await _context.SaveChangesAsync();
-                    }
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!OrderExists(order.OrderId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["Products"] = new MultiSelectList(_context.Product, "PizzaId", "PizzaName", selectedProducts);
-            return View(order);
+
+            // Repopulate products for redisplay
+            viewModel.Products = await _context.Product.ToListAsync();
+            if (viewModel.OrderProducts == null || viewModel.OrderProducts.Count == 0)
+            {
+                viewModel.OrderProducts = viewModel.Products
+                    .Select(p => new OrderProduct { PizzaId = p.PizzaId, Quantity = 0 })
+                    .ToList();
+            }
+            return View(viewModel);
         }
 
         // GET: Orders/Delete/5

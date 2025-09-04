@@ -1,7 +1,10 @@
-﻿@model ProntoPizzas.Models.Order
+﻿@using ProntoPizzas.Models
+@model ProntoPizzas.Models.OrderCreateViewModel
 
 @{
     ViewData["Title"] = "Edit";
+    var products = Model.Products;
+    var orderProducts = Model.OrderProducts;
 }
 
 <h1>Edit</h1>
@@ -10,34 +13,56 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Order.OrderId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="OrderId" />
-            <div class="form-group">
-                <label asp-for="OrderDate" class="control-label"></label>
-                <input asp-for="OrderDate" class="form-control" />
-                <span asp-validation-for="OrderDate" class="text-danger"></span>
+            <div class="form-group input-section">
+                <label asp-for="Order.OrderDate" class="control-label"></label>
+                <input asp-for="Order.OrderDate" class="form-control" />
+                <span asp-validation-for="Order.OrderDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CustomerName" class="control-label"></label>
-                <input asp-for="CustomerName" class="form-control" />
-                <span asp-validation-for="CustomerName" class="text-danger"></span>
+            <div class="form-group input-section">
+                <label asp-for="Order.CustomerName" class="control-label"></label>
+                <input asp-for="Order.CustomerName" class="form-control" />
+                <span asp-validation-for="Order.CustomerName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="DeliveryAddress" class="control-label"></label>
-                <input asp-for="DeliveryAddress" class="form-control" />
-                <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
+            <div class="form-group input-section">
+                <label asp-for="Order.DeliveryAddress" class="control-label"></label>
+                <input asp-for="Order.DeliveryAddress" class="form-control" />
+                <span asp-validation-for="Order.DeliveryAddress" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label for="selectedProducts" class="control-label">Products</label>
-                <select id="selectedProducts" name="selectedProducts" class="form-control" multiple="multiple" asp-items="ViewBag.Products"></select>
+            <div class="form-group input-section">
+                <label class="control-label">Products and Quantities</label>
+                <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th>Pizza</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < products.Count; i++)
+                        {
+                            var op = orderProducts.FirstOrDefault(x => x.PizzaId == products[i].PizzaId) ?? new OrderProduct { PizzaId = products[i].PizzaId, Quantity = 0 };
+                            <tr>
+                                <td>
+                                    @products[i].PizzaName
+                                    <input type="hidden" name="OrderProducts[@i].PizzaId" value="@products[i].PizzaId" />
+                                </td>
+                                <td>
+                                    <input type="number" name="OrderProducts[@i].Quantity" value="@op.Quantity" min="0" class="form-control" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
-            <div class="form-group">
-                <label asp-for="OrderStatus" class="control-label"></label>
-                <input asp-for="OrderStatus" class="form-control" />
-                <span asp-validation-for="OrderStatus" class="text-danger"></span>
+            <div class="form-group input-section">
+                <label asp-for="Order.OrderStatus" class="control-label"></label>
+                <input asp-for="Order.OrderStatus" class="form-control" />
+                <span asp-validation-for="Order.OrderStatus" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group submit-button">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
@@ -45,7 +70,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a class="crud-link" asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

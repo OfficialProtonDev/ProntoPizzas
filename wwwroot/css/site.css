@@ -17,8 +17,69 @@ html {
   min-height: 100%;
 }
 
+.navbar-dark {
+    background-color: #0b0b0baa;
+}
+
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),url(/img/bg-img.jpg);
+    background-size: contain;
+    color: white;
+}
+
+.custom-table {
+    background-color: #0b0b0baa;
+    color: #fff !important;
+}
+
+.custom-table th,
+.custom-table td {
+    background-color: inherit !important;
+    color: inherit !important;
+}
+
+.input-section {
+    margin-bottom: 15px;
+}
+
+.input-section input, .input-section input:focus {
+    background-color: #222;
+    color: white;
+}
+
+.submit-button {
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+.crud-link {
+    color: lightsteelblue;
+}
+
+.crud-link:hover {
+    color: steelblue;
+}
+
+.account-input, .account-input:focus {
+    background-color: #222;
+    color: white;
+}
+
+.account-link {
+    color: lightsteelblue;
+}
+
+.account-link:hover {
+    color: steelblue;
+}
+
+.light-link {
+    color: lightsteelblue;
+}
+
+.light-link:hover {
+    color: steelblue;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {

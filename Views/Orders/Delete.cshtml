@@ -34,7 +34,7 @@
             <ul>
                 @foreach (var op in Model.OrderProducts)
                 {
-                    <li>@op.Product.PizzaName</li>
+                    <li>@op.Product.PizzaName (@op.Quantity)</li>
                 }
             </ul>
         </dd>
@@ -49,6 +49,6 @@
     <form asp-action="Delete">
         <input type="hidden" asp-for="OrderId" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <a class="crud-link" asp-action="Index">Back to List</a>
     </form>
 </div>

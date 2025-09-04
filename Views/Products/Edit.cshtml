@@ -13,32 +13,32 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="PizzaId" />
-            <div class="form-group">
+            <div class="form-group input-section">
                 <label asp-for="PizzaName" class="control-label"></label>
                 <input asp-for="PizzaName" class="form-control" />
                 <span asp-validation-for="PizzaName" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group input-section">
                 <label asp-for="PizzaDescription" class="control-label"></label>
                 <input asp-for="PizzaDescription" class="form-control" />
                 <span asp-validation-for="PizzaDescription" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group input-section">
                 <label asp-for="Ingredients" class="control-label"></label>
                 <input asp-for="Ingredients" class="form-control" />
                 <span asp-validation-for="Ingredients" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group input-section">
                 <label asp-for="ImageUrl" class="control-label"></label>
                 <input asp-for="ImageUrl" class="form-control" />
                 <span asp-validation-for="ImageUrl" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group input-section">
                 <label asp-for="Price" class="control-label"></label>
                 <input asp-for="Price" class="form-control" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group submit-button">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
@@ -46,7 +46,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a class="crud-link" asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

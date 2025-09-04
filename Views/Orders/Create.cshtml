@@ -1,8 +1,9 @@
-﻿@model ProntoPizzas.Models.Order
+﻿@model ProntoPizzas.Models.OrderCreateViewModel
 
 @{
     ViewData["Title"] = "Create";
-    var products = ViewBag.Products as List<ProntoPizzas.Models.Product>;
+    var products = Model.Products;
+    var orderProducts = Model.OrderProducts;
 }
 
 <h1>Create</h1>
@@ -11,26 +12,26 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="OrderDate" class="control-label"></label>
-                <input asp-for="OrderDate" class="form-control" />
-                <span asp-validation-for="OrderDate" class="text-danger"></span>
+            <div class="form-group input-section">
+                <label asp-for="Order.OrderDate" class="control-label"></label>
+                <input asp-for="Order.OrderDate" class="form-control" />
+                <span asp-validation-for="Order.OrderDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CustomerName" class="control-label"></label>
-                <input asp-for="CustomerName" class ="form-control" />
-                <span asp-validation-for="CustomerName" class="text-danger"></span>
+            <div class="form-group input-section">
+                <label asp-for="Order.CustomerName" class="control-label"></label>
+                <input asp-for="Order.CustomerName" class="form-control" />
+                <span asp-validation-for="Order.CustomerName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="DeliveryAddress" class="control-label"></label>
-                <input asp-for="DeliveryAddress" class="form-control" />
-                <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
+            <div class="form-group input-section">
+                <label asp-for="Order.DeliveryAddress" class="control-label"></label>
+                <input asp-for="Order.DeliveryAddress" class="form-control" />
+                <span asp-validation-for="Order.DeliveryAddress" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group input-section">
                 <label class="control-label">Products and Quantities</label>
-                <table class="table">
+                <table class="table custom-table">
                     <thead>
                         <tr>
                             <th>Pizza</th>
@@ -43,22 +44,22 @@
                             <tr>
                                 <td>
                                     @products[i].PizzaName
-                                    <input type="hidden" name="OrderProducts[@i].PizzaId" value="@products[i].PizzaId" />
+                                    <input type="hidden" asp-for="OrderProducts[@i].PizzaId" value="@products[i].PizzaId" />
                                 </td>
                                 <td>
-                                    <input type="number" name="OrderProducts[@i].Quantity" value="0" min="0" class="form-control" />
+                                    <input type="number" asp-for="OrderProducts[@i].Quantity" min="0" class="form-control" />
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
-            <div class="form-group">
-                <label asp-for="OrderStatus" class="control-label"></label>
-                <input asp-for="OrderStatus" class="form-control" />
-                <span asp-validation-for="OrderStatus" class="text-danger"></span>
+            <div class="form-group input-section">
+                <label asp-for="Order.OrderStatus" class="control-label"></label>
+                <input asp-for="Order.OrderStatus" class="form-control" />
+                <span asp-validation-for="Order.OrderStatus" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group submit-button">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
@@ -66,7 +67,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a class="crud-link" asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
