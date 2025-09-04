@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ProntoPizzas.Controllers
 {
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class RolesController : Controller
     {
         private readonly UserManager<IdentityUser> _userManager;
