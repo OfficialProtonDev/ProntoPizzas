@@ -1,6 +1,8 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 import './App.css';
 
+// temp data for display
 const featuredMenu = [
     {
         name: "Margherita",
@@ -21,16 +23,18 @@ const featuredMenu = [
         img: "/pizza1.png"
     }
 ];
-
+//nav bar
 export default function Home() {
     return (
         <div className="home-container">
             <header className="home-header">
                 <div className="header-left">
-                    <div className="logo">
-                        Pronto Pizzas
-                        <span className="shop-tagline">Authentic. Fresh. Fast.</span>
-                    </div>
+                    <Link to="/" className="logo-link">
+                        <div className="logo">
+                            Pronto Pizzas
+                            <span className="shop-tagline">Authentic. Fresh. Fast.</span>
+                        </div>
+                    </Link>
                     <nav className="nav-links">
                         <a href="/menu">Menu</a>
                         <a href="/order">Order</a>
@@ -38,6 +42,7 @@ export default function Home() {
                     </nav>
                 </div>
             </header>
+            {/* Hero Section */}
             <main className="main-hero">
                 <section className="hero-content">
                     <h1>Freshly Hot cooked Pizzas</h1>
@@ -48,7 +53,7 @@ export default function Home() {
                     <img src="/pizza1.png" alt="Pizza" className="pizza-img" />
                 </div>
             </main>
-
+            {/* Featured Menu Section */}
             <section className="featured-menu">
                 <div className="curve-divider" aria-hidden="true">
                     <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
