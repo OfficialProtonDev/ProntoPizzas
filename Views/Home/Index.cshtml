@@ -3,12 +3,15 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4 page-title">Welcome to Pronto Pizza!</h1>
+    <div class="page-title">
+        <img src="~/img/pizza_logo_white.png" height="100" width="100" border="0" class="mb-2" />
+        <h1 class="display-4">Welcome to Pronto Pizza!</h1>
+    </div>
 
     <section class="py-5">
         <div class="container px-5 my-5">
             <div class="row gx-5">
-                <div class="row gx-5 row-cols-4">
+                <div class="row gx-5 row-cols-3">
                     <div class="col mb-5 h-100">
                         <a class="text-light" asp-area="" asp-controller="Products" asp-action="Index">
                             <div class="action bg-light bg-gradient text-dark rounded-3 mb-3"><i class="bi bi-fork-knife"></i></div>
@@ -29,13 +32,6 @@
                             <h2 class="h5">Roles</h2>
                         </a>
                         <p class="mb-0">View and edit roles.</p>
-                    </div>
-                    <div class="col h-100">
-                        <a class="text-light" asp-area="" asp-controller="Products" asp-action="Index">
-                            <div class="action bg-light bg-gradient text-dark rounded-3 mb-3"><i class="bi bi-gear-fill"></i></div>
-                            <h2 class="h5">temp</h2>
-                        </a>
-                        <p class="mb-0">placeholder, can be removed</p>
                     </div>
                 </div>
             </div>
