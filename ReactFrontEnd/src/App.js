@@ -1,12 +1,14 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { CartProvider } from './CartContext'; 
 import Home from './Home';
 import Menu from './Menu';
-import Order from './order';
-import Tracking from './tracking';
+import Order from './Order';
+import Tracking from './Tracking';
 
 function App() {
     return (
+        <CartProvider>
         <Router>
             <div className="App">
                 <Routes>
@@ -17,6 +19,7 @@ function App() {
                 </Routes>
             </div>
         </Router>
+        </CartProvider>
     );
 }
 
