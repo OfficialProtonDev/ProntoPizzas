@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProntoPizzas.Data;
 
+var CORSAllowSpecificOrigins = "_CORSAllowed";
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -32,6 +34,15 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: CORSAllowSpecificOrigins,
+    policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "http://www.contoso.com");
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -51,6 +62,8 @@ else
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+app.UseCors(CORSAllowSpecificOrigins);
 
 app.UseAuthorization();
 
