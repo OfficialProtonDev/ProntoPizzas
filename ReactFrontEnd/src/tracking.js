@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import './App.css';
 
@@ -45,7 +45,12 @@ function Tracking() {
             setIsLoading(false);
         }
     };
-
+    useEffect(() => {
+        document.title = "Order Tracking - Pronto Pizzas";
+        return () => {
+            document.title = "Pronto Pizzas"; // Reset to default
+        };
+    }, []);
     const handleSubmit = (e) => {
         e.preventDefault();
 
