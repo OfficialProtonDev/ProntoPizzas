@@ -673,6 +673,8 @@ html {
 .logo-link {
     text-decoration: none;
     color: inherit;
+    display:flex;
+    align-items:center;
 }
 
     .logo-link:hover {
@@ -683,6 +685,12 @@ html {
     .logo-link:visited {
         color: inherit;
     }
+.logo-img {
+    height: 4rem; 
+    width: auto;
+    margin-right: 0.8rem; 
+    vertical-align: middle;
+}
 
 /* Responsive adjustments */
 @media (max-width: 1100px) {
@@ -715,6 +723,11 @@ html {
 
     .logo {
         font-size: 2rem;
+    }
+
+    .logo-img {
+        height: 4rem; 
+        margin-right: 0.6rem;
     }
 
     .nav-links {

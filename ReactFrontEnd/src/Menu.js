@@ -178,6 +178,7 @@ export default function Menu() {
             <header className="home-header">
                 <div className="header-left">
                     <Link to="/" className="logo-link">
+                        <img src="/pizza_logo_yellow.png" alt="Logo" className="logo-img" />
                         <div className="logo">
                             Pronto Pizzas
                             <span className="shop-tagline">Authentic. Fresh. Fast.</span>
