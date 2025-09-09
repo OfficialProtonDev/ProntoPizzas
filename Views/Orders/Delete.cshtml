@@ -34,7 +34,7 @@
             <ul>
                 @foreach (var op in Model.OrderProducts)
                 {
-                    <li>@op.Product.PizzaName (@op.Quantity)</li>
+                    <li>@op.Product.PizzaName (@op.Size) x @op.Quantity</li>
                 }
             </ul>
         </dd>

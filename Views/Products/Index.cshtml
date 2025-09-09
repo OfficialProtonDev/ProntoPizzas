@@ -25,7 +25,13 @@
                 @Html.DisplayNameFor(model => model.ImageUrl)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
+                @Html.DisplayNameFor(model => model.SmallPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MediumPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LargePrice)
             </th>
             <th></th>
         </tr>
@@ -46,7 +52,13 @@
                 @Html.DisplayFor(modelItem => item.ImageUrl)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Price)
+                @Html.DisplayFor(modelItem => item.SmallPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MediumPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LargePrice)
             </td>
             <td>
                 <a class="crud-link" asp-action="Edit" asp-route-id="@item.PizzaId">Edit</a> |

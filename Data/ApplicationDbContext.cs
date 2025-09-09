@@ -31,6 +31,18 @@ namespace ProntoPizzas.Data
                 .HasOne(op => op.Product)
                 .WithMany(p => p.OrderProducts)
                 .HasForeignKey(op => op.PizzaId);
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.SmallPrice)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.MediumPrice)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.LargePrice)
+                .HasPrecision(18, 2);
         }
     }
 }

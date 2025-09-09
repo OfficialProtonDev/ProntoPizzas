@@ -48,12 +48,13 @@ namespace ProntoPizzas.Controllers
         // GET: Orders/Create
         public IActionResult Create()
         {
+            var products = _context.Product.ToList();
             var viewModel = new OrderCreateViewModel
             {
-                Products = _context.Product.ToList()
+                Products = products,
+                OrderProducts = new List<OrderProduct> { new OrderProduct() },
+                PizzaSelectList = new SelectList(products, "PizzaId", "PizzaName")
             };
-            // Prepopulate OrderProducts for binding
-            viewModel.OrderProducts = viewModel.Products.Select(p => new OrderProduct { PizzaId = p.PizzaId, Quantity = 0 }).ToList();
             return View(viewModel);
         }
 
@@ -62,34 +63,27 @@ namespace ProntoPizzas.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(OrderCreateViewModel viewModel)
         {
-            if (ModelState.IsValid)
-            {
-                viewModel.Order.OrderId = Guid.NewGuid();
-                viewModel.Order.OrderProducts = viewModel.OrderProducts.Where(op => op.Quantity > 0).ToList();
-                _context.Add(viewModel.Order);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            // Repopulate products and OrderProducts if validation fails
-            viewModel.Products = _context.Product.ToList();
-            if (viewModel.OrderProducts == null || viewModel.OrderProducts.Count == 0)
-            {
-                viewModel.OrderProducts = viewModel.Products.Select(p => new OrderProduct { PizzaId = p.PizzaId, Quantity = 0 }).ToList();
-            }
-            if (!ModelState.IsValid)
-            {
-                var errors = ModelState
-                    .SelectMany(x => x.Value.Errors.Select(e => $"{x.Key}: {e.ErrorMessage}"))
-                    .ToList();
+            var order = viewModel.Order;
+            order.OrderId = Guid.NewGuid();
 
-                // Log errors to the output window
-                foreach (var error in errors)
-                {
-                    System.Diagnostics.Debug.WriteLine(error);
-                }
+            var orderProducts = viewModel.OrderProducts
+                .Where(op => op.Quantity > 0)
+                .Select(op => new OrderProduct
+                 {
+                    OrderId = order.OrderId,
+                    PizzaId = op.PizzaId,
+                    Size = op.Size,
+                    Quantity = op.Quantity
+                 }).ToList();
 
-                // Optionally, set a breakpoint here and inspect 'errors' in the debugger
-            }
+            order.OrderProducts = orderProducts;
+
+            _context.Order.Add(order);
+            _context.OrderProduct.AddRange(orderProducts);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+
+            viewModel.PizzaSelectList = new SelectList(_context.Product, "PizzaId", "PizzaName");
             return View(viewModel);
         }
 
@@ -108,24 +102,24 @@ namespace ProntoPizzas.Controllers
 
             var products = await _context.Product.ToListAsync();
 
-            // Build OrderProducts for all products, using existing quantities or 0
-            var orderProducts = products
-                .Select(p =>
+            var orderProducts = order.OrderProducts
+                .Select(op => new OrderProduct
                 {
-                    var op = order.OrderProducts.FirstOrDefault(x => x.PizzaId == p.PizzaId);
-                    return new OrderProduct
-                    {
-                        PizzaId = p.PizzaId,
-                        Quantity = op?.Quantity ?? 0
-                    };
-                })
-                .ToList();
+                    OrderId = order.OrderId,
+                    PizzaId = op.PizzaId,
+                    Size = op.Size,
+                    Quantity = op.Quantity
+                }).ToList();
+
+            if (orderProducts.Count == 0)
+                orderProducts.Add(new OrderProduct());
 
             var viewModel = new OrderCreateViewModel
             {
                 Order = order,
                 Products = products,
-                OrderProducts = orderProducts
+                OrderProducts = orderProducts,
+                PizzaSelectList = new SelectList(products, "PizzaId", "PizzaName")
             };
 
             return View(viewModel);
@@ -139,9 +133,7 @@ namespace ProntoPizzas.Controllers
             if (id != viewModel.Order.OrderId)
                 return NotFound();
 
-            if (ModelState.IsValid)
-            {
-                var order = await _context.Order
+            var order = await _context.Order
                     .Include(o => o.OrderProducts)
                     .FirstOrDefaultAsync(o => o.OrderId == id);
 
@@ -164,22 +156,20 @@ namespace ProntoPizzas.Controllers
                     {
                         OrderId = order.OrderId,
                         PizzaId = op.PizzaId,
+                        Size = op.Size,
                         Quantity = op.Quantity
                     })
                     .ToList();
 
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
-            }
 
             // Repopulate products for redisplay
             viewModel.Products = await _context.Product.ToListAsync();
+            viewModel.PizzaSelectList = new SelectList(_context.Product, "PizzaId", "PizzaName");
+            viewModel.Products = await _context.Product.ToListAsync();
             if (viewModel.OrderProducts == null || viewModel.OrderProducts.Count == 0)
-            {
-                viewModel.OrderProducts = viewModel.Products
-                    .Select(p => new OrderProduct { PizzaId = p.PizzaId, Quantity = 0 })
-                    .ToList();
-            }
+                viewModel.OrderProducts = new List<OrderProduct> { new OrderProduct() };
             return View(viewModel);
         }
 

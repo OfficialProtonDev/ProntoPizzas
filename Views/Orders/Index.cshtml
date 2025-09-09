@@ -46,7 +46,9 @@
                     <ul>
                         @foreach (var op in item.OrderProducts)
                         {
-                            <li>@op.Product.PizzaName (@op.Quantity)</li>
+                            <div>
+                                @op.Product.PizzaName (@op.Size) x @op.Quantity
+                            </div>
                         }
                     </ul>
                 </td>

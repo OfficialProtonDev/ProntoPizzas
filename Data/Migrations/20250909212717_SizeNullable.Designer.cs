@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProntoPizzas.Data;
 
@@ -11,9 +12,11 @@ using ProntoPizzas.Data;
 namespace ProntoPizzas.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250909212717_SizeNullable")]
+    partial class SizeNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -236,7 +239,6 @@ namespace ProntoPizzas.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Size")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("OrderId", "PizzaId");
@@ -282,11 +284,9 @@ namespace ProntoPizzas.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("LargePrice")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("MediumPrice")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("PizzaDescription")
@@ -296,7 +296,6 @@ namespace ProntoPizzas.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("SmallPrice")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("PizzaId");

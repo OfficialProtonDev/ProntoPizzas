@@ -32,30 +32,23 @@
                 <span asp-validation-for="Order.DeliveryAddress" class="text-danger"></span>
             </div>
             <div class="form-group input-section">
-                <label class="control-label">Products and Quantities</label>
-                <table class="table custom-table">
-                    <thead>
-                        <tr>
-                            <th>Pizza</th>
-                            <th>Quantity</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (int i = 0; i < products.Count; i++)
-                        {
-                            var op = orderProducts.FirstOrDefault(x => x.PizzaId == products[i].PizzaId) ?? new OrderProduct { PizzaId = products[i].PizzaId, Quantity = 0 };
-                            <tr>
-                                <td>
-                                    @products[i].PizzaName
-                                    <input type="hidden" name="OrderProducts[@i].PizzaId" value="@products[i].PizzaId" />
-                                </td>
-                                <td>
-                                    <input type="number" name="OrderProducts[@i].Quantity" value="@op.Quantity" min="0" class="form-control" />
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                <div id="pizza-rows">
+                    @for (int i = 0; i < Model.OrderProducts.Count; i++)
+                    {
+                        <div class="order-row">
+                            <select asp-for="OrderProducts[i].PizzaId" asp-items="Model.PizzaSelectList"></select>
+                            <select asp-for="OrderProducts[i].Size">
+                                <option value="Small">Small</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Large">Large</option>
+                            </select>
+                            <input asp-for="OrderProducts[i].Quantity" type="number" min="1" />
+                            <span asp-validation-for="OrderProducts[i].Quantity" class="text-danger"></span>
+                            <button type="button" class="btn btn-danger" onclick="removeRow(this)">Remove</button>
+                        </div>
+                    }
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addRow()">Add Pizza</button>
             </div>
             @{
                 var statuses = new[] { "Preparing", "Baking", "Delivering", "Delivered", "Cancelled" };

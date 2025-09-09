@@ -19,7 +19,14 @@ namespace ProntoPizzas.Models
         [Display(Name = "Image URL")]
         public string? ImageUrl { get; set; }
 
-        public decimal? Price { get; set; }
+        [Display(Name = "Small Price")]
+        public decimal SmallPrice { get; set; }
+
+        [Display(Name = "Medium Price")]
+        public decimal MediumPrice { get; set; }
+
+        [Display(Name = "Large Price")]
+        public decimal LargePrice { get; set; }
 
         public ICollection<OrderProduct> OrderProducts { get; set; } = new List<OrderProduct>();
     }

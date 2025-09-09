@@ -1,4 +1,5 @@
 using ProntoPizzas.Models;
+using System.ComponentModel.DataAnnotations;
 
 public class OrderProduct
 {
@@ -8,5 +9,8 @@ public class OrderProduct
     public Guid PizzaId { get; set; }
     public Product? Product { get; set; }
 
+    [Required]
+    public string? Size { get; set; }
+    [Range(1, 100)]
     public int Quantity { get; set; }
 }
