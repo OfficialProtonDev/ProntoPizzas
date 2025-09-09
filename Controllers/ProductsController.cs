@@ -54,7 +54,7 @@ namespace ProntoPizzas.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PizzaId,PizzaName,PizzaDescription,Ingredients,ImageUrl,Price")] Product product)
+        public async Task<IActionResult> Create([Bind("PizzaId,PizzaName,PizzaDescription,Ingredients,ImageUrl,SmallPrice,MediumPrice,LargePrice")] Product product)
         {
             if (ModelState.IsValid)
             {
@@ -87,7 +87,7 @@ namespace ProntoPizzas.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("PizzaId,PizzaName,PizzaDescription,Ingredients,ImageUrl,Price")] Product product)
+        public async Task<IActionResult> Edit(Guid id, [Bind("PizzaId,PizzaName,PizzaDescription,Ingredients,ImageUrl,SmallPrice,MediumPrice,LargePrice")] Product product)
         {
             if (id != product.PizzaId)
             {
