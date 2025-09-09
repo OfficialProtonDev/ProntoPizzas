@@ -210,6 +210,8 @@ html {
     margin-bottom: 2rem;
     transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
     text-align: left;
+    text-decoration:none;
+    display: inline-block;
 }
 
     .order-btn:hover {
