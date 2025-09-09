@@ -31,17 +31,29 @@ function Order() {
         setIsProcessing(true);
 
         try {
-            // Call your /placeOrder API
-            const response = await fetch('/placeOrder', {
+            // Transform cart items to match API expectations
+            const orderProducts = items.map(item => ({
+                pizzaId: item.pizzaId,
+                size: item.size,
+                quantity: item.quantity
+            }));
+
+            // Prepare order object for API
+            const orderPayload = {
+                orderDate: new Date().toISOString(),
+                customerName: orderData.customerName,
+                deliveryAddress: orderData.deliveryAddress,
+                orderStatus: "Preparing",
+                orderProducts: orderProducts
+            };
+
+            // Call the OrdersApi POST endpoint
+            const response = await fetch('/api/OrdersApi', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    CustomerName: orderData.customerName,
-                    Items: orderData.items,
-                    DeliveryAddress: orderData.deliveryAddress
-                })
+                body: JSON.stringify(orderPayload)
             });
 
             if (!response.ok) {
@@ -49,7 +61,7 @@ function Order() {
             }
 
             const result = await response.json();
-            const orderId = result.OrderId;
+            const orderId = result.orderId;
 
             // Clear cart and navigate to tracking
             clearCart();
@@ -115,24 +127,24 @@ function Order() {
                                 <h2>Your Items ({items.length} items)</h2>
                                 <div className="cart-items">
                                     {items.map((item) => (
-                                        <div key={`${item.productId}-${item.variantId}`} className="cart-item">
-                                            <img src={item.image} alt={item.productName} className="cart-item-image" />
+                                        <div key={`${item.pizzaId}-${item.size}`} className="cart-item">
+                                            <img src={item.image || "/pizza1.png"} alt={item.pizzaName} className="cart-item-image" />
                                             <div className="cart-item-details">
-                                                <h3>{item.productName}</h3>
-                                                <p className="cart-item-variant">{item.variantName}</p>
+                                                <h3>{item.pizzaName}</h3>
+                                                <p className="cart-item-variant">{item.size}</p>
                                                 <p className="cart-item-price">${item.price.toFixed(2)} each</p>
                                             </div>
                                             <div className="cart-item-controls">
                                                 <div className="quantity-controls">
                                                     <button
-                                                        onClick={() => updateQuantity(item.productId, item.variantId, item.quantity - 1)}
+                                                        onClick={() => updateQuantity(item.pizzaId, item.size, item.quantity - 1)}
                                                         className="quantity-btn"
                                                     >
                                                         -
                                                     </button>
                                                     <span className="quantity">{item.quantity}</span>
                                                     <button
-                                                        onClick={() => updateQuantity(item.productId, item.variantId, item.quantity + 1)}
+                                                        onClick={() => updateQuantity(item.pizzaId, item.size, item.quantity + 1)}
                                                         className="quantity-btn"
                                                     >
                                                         +
@@ -140,7 +152,7 @@ function Order() {
                                                 </div>
                                                 <p className="cart-item-subtotal">${(item.price * item.quantity).toFixed(2)}</p>
                                                 <button
-                                                    onClick={() => removeFromCart(item.productId, item.variantId)}
+                                                    onClick={() => removeFromCart(item.pizzaId, item.size)}
                                                     className="remove-btn"
                                                 >
                                                     Remove

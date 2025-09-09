@@ -59,16 +59,10 @@ function DeliveryModal({ isOpen, onClose, onSubmit, cartTotal, cartItems }) {
             // Prepare order data for API
             const customerName = `${customerInfo.firstName} ${customerInfo.lastName}`;
             const deliveryAddress = `${customerInfo.address}, ${customerInfo.city}, ${customerInfo.zipCode}`;
-            const items = cartItems.map(item => ({
-                ProductId: item.productId,
-                VariantId: item.variantId,
-                Quantity: item.quantity
-            }));
 
             // Call the onSubmit function passed from parent
             await onSubmit({
                 customerName,
-                items,
                 deliveryAddress,
                 customerInfo // Include full customer info for reference
             });

@@ -6,7 +6,6 @@ function Tracking() {
     const [orderId, setOrderId] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-
     const [orderData, setOrderData] = useState(null);
 
     const trackOrder = async (orderIdToTrack) => {
@@ -14,13 +13,12 @@ function Tracking() {
         setError('');
 
         try {
-            // Call your /trackOrder API
-            const response = await fetch('/trackOrder', {
-                method: 'POST',
+            // Call the OrdersApi GET endpoint with ID
+            const response = await fetch(`/api/OrdersApi/${orderIdToTrack}`, {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ OrderId: orderIdToTrack })
+                }
             });
 
             if (!response.ok) {
@@ -29,12 +27,14 @@ function Tracking() {
 
             const data = await response.json();
 
+            // Transform the API response to match our component's expectations
             const transformedData = {
-                orderId: orderIdToTrack,
-                customerName: data.CustomerName,
-                deliveryAddress: data.DeliveryAddress,
-                orderStatus: data.OrderStatus,
-                items: data.Items || []
+                orderId: data.orderId,
+                customerName: data.customerName,
+                deliveryAddress: data.deliveryAddress,
+                orderStatus: data.orderStatus,
+                orderDate: data.orderDate,
+                items: data.orderProducts || []
             };
             setOrderData(transformedData);
         }
@@ -45,12 +45,14 @@ function Tracking() {
             setIsLoading(false);
         }
     };
+
     useEffect(() => {
         document.title = "Order Tracking - Pronto Pizzas";
         return () => {
             document.title = "Pronto Pizzas"; // Reset to default
         };
     }, []);
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -62,20 +64,19 @@ function Tracking() {
     };
 
     const getStatusStep = (status) => {
-        const statuses = ['ordered', 'preparing', 'baking', 'ready', 'delivering', 'delivered'];
-        return statuses.indexOf(status.toLowerCase()) + 1;
+        const statuses = ['preparing', 'baking', 'ready', 'delivering', 'delivered'];
+        return statuses.indexOf(status?.toLowerCase()) + 1;
     };
 
     const getStatusDisplay = (status) => {
         const statusMap = {
-            'ordered': 'Order Placed',
             'preparing': 'Preparing your order',
             'baking': 'Baking in the oven',
             'ready': 'Ready for pickup/delivery',
             'delivering': 'Out for delivery',
             'delivered': 'Delivered'
         };
-        return statusMap[status.toLowerCase()] || status;
+        return statusMap[status?.toLowerCase()] || status;
     };
 
     return (
@@ -111,7 +112,7 @@ function Tracking() {
                                     id="orderId"
                                     value={orderId}
                                     onChange={(e) => setOrderId(e.target.value)}
-                                    placeholder="e.g., ORD-123456"
+                                    placeholder="e.g., 3fa85f64-5717-4562-b3fc-2c963f66afa6"
                                     className={error ? 'error' : ''}
                                 />
                                 {error && <span className="error-message">{error}</span>}
@@ -136,7 +137,7 @@ function Tracking() {
                             <div className="status-progress">
                                 <h3>Order Status: {getStatusDisplay(orderData.orderStatus)}</h3>
                                 <div className="progress-bar">
-                                    {['ordered', 'preparing', 'baking', 'ready', 'delivering', 'delivered'].map((status, index) => (
+                                    {['preparing', 'baking', 'ready', 'delivering', 'delivered'].map((status, index) => (
                                         <div
                                             key={status}
                                             className={`progress-step ${getStatusStep(orderData.orderStatus) > index ? 'completed' : ''
@@ -157,6 +158,9 @@ function Tracking() {
                                     <p><strong>Name:</strong> {orderData.customerName}</p>
                                     <p><strong>Delivery Address:</strong> {orderData.deliveryAddress}</p>
                                     <p><strong>Order ID:</strong> {orderData.orderId}</p>
+                                    {orderData.orderDate && (
+                                        <p><strong>Order Date:</strong> {new Date(orderData.orderDate).toLocaleDateString()}</p>
+                                    )}
                                 </div>
 
                                 {/* Order Items */}
@@ -166,9 +170,14 @@ function Tracking() {
                                         <div className="order-items">
                                             {orderData.items.map((item, index) => (
                                                 <div key={index} className="order-item">
-                                                    <span>Product ID: {item.ProductId}</span>
-                                                    <span>Variant ID: {item.VariantId}</span>
-                                                    <span>Quantity: {item.Quantity}</span>
+                                                    <div className="item-details">
+                                                        <h4>{item.product?.pizzaName || 'Pizza'}</h4>
+                                                        <p>Size: {item.size}</p>
+                                                        <p>Quantity: {item.quantity}</p>
+                                                        {item.product?.pizzaDescription && (
+                                                            <p className="item-description">{item.product.pizzaDescription}</p>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>

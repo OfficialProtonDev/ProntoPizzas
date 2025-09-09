@@ -13,7 +13,7 @@ export default function Menu() {
 
     // Toast notification state
     const [showToast, setShowToast] = useState(false);
-    const [toastData, setToastData] = useState({ productName: '', variantName: '', price: 0 });
+    const [toastData, setToastData] = useState({ productName: '', size: '', price: 0 });
 
     const { addToCart, itemCount } = useCart();
     const categories = ["All", "Classic", "Premium", "Vegetarian", "Meat Lovers"];
@@ -31,7 +31,7 @@ export default function Menu() {
         setError('');
 
         try {
-            const response = await fetch('/getProducts', {
+            const response = await fetch('https://localhost:7212/api/ProductsApi', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -44,14 +44,17 @@ export default function Menu() {
 
             const data = await response.json();
 
-          
-            const transformedProducts = data.map(product => [
-                product.ProductId,
-                product.Name,
-                product.Description,
-                product.Variants || [], 
-                product.ImageUrl
-            ]);
+            // Transform API data to ensure it has the expected structure
+            const transformedProducts = data.map(pizza => ({
+                pizzaId: pizza.pizzaId,
+                pizzaName: pizza.pizzaName,
+                pizzaDescription: pizza.pizzaDescription,
+                ingredients: pizza.ingredients,
+                imageUrl: pizza.imageUrl || "/pizza1.png",
+                smallPrice: pizza.smallPrice || 0,
+                mediumPrice: pizza.mediumPrice || 0,
+                largePrice: pizza.largePrice || 0
+            }));
 
             setProducts(transformedProducts);
         } catch (error) {
@@ -60,17 +63,16 @@ export default function Menu() {
 
             // use temp data on error 
             setProducts([
-                [
-                    1,
-                    "Margherita Classic",
-                    "Fresh mozzarella, San Marzano tomatoes, fresh basil, extra virgin olive oil",
-                    [
-                        [1, "Regular (23cm)", 18.90],
-                        [2, "Large (28cm)", 24.90],
-                        [3, "Family (33cm)", 29.90]
-                    ],
-                    "/pizza1.png"
-                ]
+                {
+                    pizzaId: "1",
+                    pizzaName: "Margherita Classic",
+                    pizzaDescription: "Fresh mozzarella, San Marzano tomatoes, fresh basil, extra virgin olive oil",
+                    ingredients: "Fresh Mozzarella, San Marzano Tomatoes, Fresh Basil, Extra Virgin Olive Oil",
+                    imageUrl: "/pizza1.png",
+                    smallPrice: 12.90,
+                    mediumPrice: 16.90,
+                    largePrice: 20.90
+                }
             ]);
         } finally {
             setLoading(false);
@@ -84,12 +86,13 @@ export default function Menu() {
 
     // Filter products by search and category
     const filteredProducts = products.filter(product => {
-        const matchesSearch = product[1].toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product[2].toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesSearch = product.pizzaName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.pizzaDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (product.ingredients && product.ingredients.toLowerCase().includes(searchTerm.toLowerCase()));
 
         if (selectedCategory === "All") return matchesSearch;
 
-        const productName = product[1].toLowerCase();
+        const productName = product.pizzaName.toLowerCase();
         switch (selectedCategory) {
             case "Classic":
                 return matchesSearch && (productName.includes("margherita") || productName.includes("pepperoni"));
@@ -105,20 +108,20 @@ export default function Menu() {
     });
 
     // Add item to cart and show toast notification
-    const handleOrder = (productId, variantId, productName, variantName, price) => {
+    const handleOrder = (pizzaId, pizzaName, size, price) => {
         const item = {
-            productId,
-            variantId,
-            productName,
-            variantName,
-            price,
+            pizzaId,
+            pizzaName,
+            size,
+            price: price || 0,
+            quantity: 1,
             image: "/pizza1.png"
         };
 
         addToCart(item);
 
         // Show toast notification
-        setToastData({ productName, variantName, price });
+        setToastData({ productName: pizzaName, size, price: price || 0 });
         setShowToast(true);
 
         // Auto-hide toast after 4 seconds
@@ -151,7 +154,7 @@ export default function Menu() {
                         <div className="toast-details">
                             <div className="toast-title">Added to Cart!</div>
                             <div className="toast-description">
-                                {toastData.productName} ({toastData.variantName}) - ${toastData.price.toFixed(2)}
+                                {toastData.productName} ({toastData.size}) - ${toastData.price.toFixed(2)}
                             </div>
                         </div>
                         <button className="toast-close" onClick={closeToast}>
@@ -260,38 +263,36 @@ export default function Menu() {
                 ) : (
                     <div className="menu-grid">
                         {filteredProducts.map(product => (
-                            <div className="menu-card" key={product[0]}>
-                                <img src={product[4]} alt={product[1]} className="menu-img" />
+                            <div className="menu-card" key={product.pizzaId}>
+                                <img src={product.imageUrl} alt={product.pizzaName} className="menu-img" />
 
                                 <div className="menu-details">
-                                    <h3>{product[1]}</h3>
-                                    <p className="menu-description">{product[2]}</p>
+                                    <h3>{product.pizzaName}</h3>
+                                    <p className="menu-description">{product.pizzaDescription}</p>
+                                    {product.ingredients && <p><strong>Ingredients:</strong> {product.ingredients}</p>}
 
-                                    {Array.isArray(product[3]) && product[3].length > 0 && (
-                                        <div className="variants-container">
-                                            <h4>Available Sizes:</h4>
-                                            {product[3].map(variant => (
-                                                <div key={variant[0]} className="variant-row">
-                                                    <div className="variant-info">
-                                                        <span className="variant-size">{variant[1]}</span>
-                                                        <span className="menu-price">${variant[2].toFixed(2)}</span>
-                                                    </div>
-                                                    <button
-                                                        className="menu-order-btn"
-                                                        onClick={() => handleOrder(
-                                                            product[0],
-                                                            variant[0],
-                                                            product[1],
-                                                            variant[1],
-                                                            variant[2]
-                                                        )}
-                                                    >
-                                                        Add to Cart
-                                                    </button>
-                                                </div>
-                                            ))}
+                                    <div className="menu-bottom">
+                                        <div className="size-options">
+                                            <button
+                                                className="menu-order-btn"
+                                                onClick={() => handleOrder(product.pizzaId, product.pizzaName, "Small", product.smallPrice)}
+                                            >
+                                                Add Small - ${product.smallPrice ? product.smallPrice.toFixed(2) : '0.00'}
+                                            </button>
+                                            <button
+                                                className="menu-order-btn"
+                                                onClick={() => handleOrder(product.pizzaId, product.pizzaName, "Medium", product.mediumPrice)}
+                                            >
+                                                Add Medium - ${product.mediumPrice ? product.mediumPrice.toFixed(2) : '0.00'}
+                                            </button>
+                                            <button
+                                                className="menu-order-btn"
+                                                onClick={() => handleOrder(product.pizzaId, product.pizzaName, "Large", product.largePrice)}
+                                            >
+                                                Add Large - ${product.largePrice ? product.largePrice.toFixed(2) : '0.00'}
+                                            </button>
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
                             </div>
                         ))}

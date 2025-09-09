@@ -14,16 +14,16 @@ const initialState = {
 function cartReducer(state, action) {
     switch (action.type) {
         case 'ADD_ITEM':
-            // Check if item already exists in cart
+            // Check if item already exists in cart (same pizza and size)
             const existingItemIndex = state.items.findIndex(
-                item => item.productId === action.payload.productId &&
-                    item.variantId === action.payload.variantId
+                item => item.pizzaId === action.payload.pizzaId &&
+                    item.size === action.payload.size
             );
 
             if (existingItemIndex > -1) {
                 // Item exists, increase quantity
                 const updatedItems = [...state.items];
-                updatedItems[existingItemIndex].quantity += 1;
+                updatedItems[existingItemIndex].quantity += action.payload.quantity || 1;
 
                 return {
                     ...state,
@@ -33,7 +33,10 @@ function cartReducer(state, action) {
                 };
             } else {
                 // New item, add to cart
-                const newItem = { ...action.payload, quantity: 1 };
+                const newItem = { 
+                    ...action.payload, 
+                    quantity: action.payload.quantity || 1 
+                };
                 const updatedItems = [...state.items, newItem];
 
                 return {
@@ -46,8 +49,8 @@ function cartReducer(state, action) {
 
         case 'REMOVE_ITEM':
             const filteredItems = state.items.filter(
-                item => !(item.productId === action.payload.productId &&
-                    item.variantId === action.payload.variantId)
+                item => !(item.pizzaId === action.payload.pizzaId &&
+                    item.size === action.payload.size)
             );
 
             return {
@@ -59,8 +62,8 @@ function cartReducer(state, action) {
 
         case 'UPDATE_QUANTITY':
             const updatedItems = state.items.map(item => {
-                if (item.productId === action.payload.productId &&
-                    item.variantId === action.payload.variantId) {
+                if (item.pizzaId === action.payload.pizzaId &&
+                    item.size === action.payload.size) {
                     return { ...item, quantity: action.payload.quantity };
                 }
                 return item;
@@ -99,15 +102,15 @@ export function CartProvider({ children }) {
         dispatch({ type: 'ADD_ITEM', payload: item });
     };
 
-    const removeFromCart = (productId, variantId) => {
-        dispatch({ type: 'REMOVE_ITEM', payload: { productId, variantId } });
+    const removeFromCart = (pizzaId, size) => {
+        dispatch({ type: 'REMOVE_ITEM', payload: { pizzaId, size } });
     };
 
-    const updateQuantity = (productId, variantId, quantity) => {
+    const updateQuantity = (pizzaId, size, quantity) => {
         if (quantity <= 0) {
-            removeFromCart(productId, variantId);
+            removeFromCart(pizzaId, size);
         } else {
-            dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, variantId, quantity } });
+            dispatch({ type: 'UPDATE_QUANTITY', payload: { pizzaId, size, quantity } });
         }
     };
 
