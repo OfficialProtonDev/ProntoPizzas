@@ -47,7 +47,12 @@ body {
     margin-bottom: 15px;
 }
 
-.input-section input, .input-section input:focus {
+.input-section input, .input-section input:focus, .input-section select, .input-section select:focus {
+    background-color: #222;
+    color: white;
+}
+
+.select-input select, .select-input select:focus {
     background-color: #222;
     color: white;
 }

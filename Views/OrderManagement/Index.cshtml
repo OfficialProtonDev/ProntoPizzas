@@ -40,7 +40,7 @@
 									@{
 										var statuses = new[] { "Preparing", "Baking", "Delivering", "Delivered", "Cancelled" };
 									}
-									<form asp-action="Update" method="post" asp-route-id="@ur.OrderId" style="display:inline;">
+									<form asp-action="Update" method="post" asp-route-id="@ur.OrderId" style="display:inline;" class="select-input">
 										<select name="status" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
 											@foreach (var s in statuses)
 											{
