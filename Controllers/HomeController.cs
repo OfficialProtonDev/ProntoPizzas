@@ -1,9 +1,11 @@
-using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProntoPizzas.Models;
+using System.Diagnostics;
 
 namespace ProntoPizzas.Controllers
 {
+    [Authorize(Roles = "Staff, Admin")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
