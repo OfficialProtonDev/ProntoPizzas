@@ -48,7 +48,7 @@ export default function Home() {
                 <section className="hero-content">
                     <h1>Freshly Hot cooked Pizzas</h1>
                     <p>Delicious pizzas made with the freshest ingredients, delivered pronto to your door.</p>
-                    <button className="order-btn">Order Now</button>
+                    <Link to="/menu" className="order-btn">Order Now</Link>
                 </section>
                 <div className="pizza-img-wrapper">
                     <img src="/pizza1.png" alt="Pizza" className="pizza-img" />

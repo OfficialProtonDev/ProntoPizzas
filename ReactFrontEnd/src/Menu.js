@@ -3,80 +3,11 @@ import { Link } from "react-router-dom";
 import { useCart } from "./CartContext";
 import "./App.css";
 
-// Temporary pizza data 
-const tempMenuData = [
-    [
-        1,
-        "Margherita Classic",
-        "Fresh mozzarella, San Marzano tomatoes, fresh basil, extra virgin olive oil",
-        [
-            [1, "Regular (23cm)", 18.90],
-            [2, "Large (28cm)", 24.90],
-            [3, "Family (33cm)", 29.90]
-        ],
-        "/pizza1.png"
-    ],
-    [
-        2,
-        "Pepperoni Supreme",
-        "Premium pepperoni, mozzarella cheese, signature tomato sauce",
-        [
-            [4, "Regular (23cm)", 21.90],
-            [5, "Large (28cm)", 27.90],
-            [6, "Family (33cm)", 32.90]
-        ],
-        "/pizza1.png"
-    ],
-    [
-        3,
-        "Veggie Deluxe",
-        "Bell peppers, red onions, black olives, mushrooms, fresh spinach, mozzarella",
-        [
-            [7, "Regular (23cm)", 20.90],
-            [8, "Large (28cm)", 26.90],
-            [9, "Family (33cm)", 31.90]
-        ],
-        "/pizza1.png"
-    ],
-    [
-        4,
-        "Meat Lovers",
-        "Pepperoni, Italian sausage, ground beef, bacon, ham, mozzarella",
-        [
-            [10, "Regular (23cm)", 24.90],
-            [11, "Large (28cm)", 30.90],
-            [12, "Family (33cm)", 35.90]
-        ],
-        "/pizza1.png"
-    ],
-    [
-        5,
-        "BBQ Chicken",
-        "Grilled chicken, BBQ sauce, red onions, cilantro, smoked mozzarella",
-        [
-            [13, "Regular (23cm)", 23.90],
-            [14, "Large (28cm)", 29.90],
-            [15, "Family (33cm)", 34.90]
-        ],
-        "/pizza1.png"
-    ],
-    [
-        6,
-        "Hawaiian Paradise",
-        "Ham, pineapple, mozzarella cheese, signature tomato sauce",
-        [
-            [16, "Regular (23cm)", 22.90],
-            [17, "Large (28cm)", 28.90],
-            [18, "Family (33cm)", 33.90]
-        ],
-        "/pizza1.png"
-    ]
-];
-
 export default function Menu() {
     // State for menu data and UI
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -87,12 +18,61 @@ export default function Menu() {
     const { addToCart, itemCount } = useCart();
     const categories = ["All", "Classic", "Premium", "Vegetarian", "Meat Lovers"];
 
+    // API call to get products
+    const fetchProducts = async () => {
+        setLoading(true);
+        setError('');
+
+        try {
+            const response = await fetch('/getProducts', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch products');
+            }
+
+            const data = await response.json();
+
+          
+            const transformedProducts = data.map(product => [
+                product.ProductId,
+                product.Name,
+                product.Description,
+                product.Variants || [], 
+                product.ImageUrl
+            ]);
+
+            setProducts(transformedProducts);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            setError('Failed to load menu. Please try again later.');
+
+            // use temp data on error 
+            setProducts([
+                [
+                    1,
+                    "Margherita Classic",
+                    "Fresh mozzarella, San Marzano tomatoes, fresh basil, extra virgin olive oil",
+                    [
+                        [1, "Regular (23cm)", 18.90],
+                        [2, "Large (28cm)", 24.90],
+                        [3, "Family (33cm)", 29.90]
+                    ],
+                    "/pizza1.png"
+                ]
+            ]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // Load menu data when component mounts
     useEffect(() => {
-        setTimeout(() => {
-            setProducts(tempMenuData);
-            setLoading(false);
-        }, 1000);
+        fetchProducts();
     }, []);
 
     // Filter products by search and category
@@ -143,6 +123,11 @@ export default function Menu() {
     // Close toast manually
     const closeToast = () => {
         setShowToast(false);
+    };
+
+    // Retry loading products
+    const retryFetch = () => {
+        fetchProducts();
     };
 
     return (
@@ -243,12 +228,22 @@ export default function Menu() {
                     <span className="product-count">({filteredProducts.length} items)</span>
                 </h2>
 
+                {/* Error State */}
+                {error && (
+                    <div className="error-state">
+                        <p>{error}</p>
+                        <button onClick={retryFetch} className="retry-btn">
+                            Retry
+                        </button>
+                    </div>
+                )}
+
                 {loading ? (
                     <div className="loading-spinner">
                         <div className="spinner"></div>
                         <p>Loading delicious pizzas...</p>
                     </div>
-                ) : filteredProducts.length === 0 ? (
+                ) : filteredProducts.length === 0 && !error ? (
                     <div className="no-results">
                         <p>No pizzas found matching your criteria.</p>
                         <button onClick={() => { setSearchTerm(""); setSelectedCategory("All"); }} className="reset-btn">
