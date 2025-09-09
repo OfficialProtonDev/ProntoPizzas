@@ -25,14 +25,20 @@ namespace ProntoPizzas.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrder()
         {
-            return await _context.Order.ToListAsync();
+            return await _context.Order
+                .Include(o => o.OrderProducts)
+                    .ThenInclude(op => op.Product)
+                .ToListAsync();
         }
 
         // GET: api/OrdersApi/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrder(Guid id)
         {
-            var order = await _context.Order.FindAsync(id);
+            var order = await _context.Order
+                .Include(o => o.OrderProducts)
+                    .ThenInclude(op => op.Product)
+                .FirstOrDefaultAsync(o => o.OrderId == id);
 
             if (order == null)
             {

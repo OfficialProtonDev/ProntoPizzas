@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ProntoPizzas.Models
 {
@@ -28,6 +29,7 @@ namespace ProntoPizzas.Models
         [Display(Name = "Large Price")]
         public decimal LargePrice { get; set; }
 
+        [JsonIgnore]
         public ICollection<OrderProduct> OrderProducts { get; set; } = new List<OrderProduct>();
     }
 }

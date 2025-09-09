@@ -1,9 +1,12 @@
 using ProntoPizzas.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 public class OrderProduct
 {
     public Guid OrderId { get; set; }
+
+    [JsonIgnore]
     public Order? Order { get; set; }
 
     public Guid PizzaId { get; set; }
