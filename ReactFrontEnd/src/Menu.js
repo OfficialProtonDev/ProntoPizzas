@@ -18,6 +18,13 @@ export default function Menu() {
     const { addToCart, itemCount } = useCart();
     const categories = ["All", "Classic", "Premium", "Vegetarian", "Meat Lovers"];
 
+    useEffect(() => {
+        document.title = " Menu - Pronto Pizzas";
+        return () => {
+            document.title = "Pronto Pizzas "; // Reset to default
+        };
+    }, []);
+
     // API call to get products
     const fetchProducts = async () => {
         setLoading(true);

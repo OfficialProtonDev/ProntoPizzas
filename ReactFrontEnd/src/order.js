@@ -1,10 +1,16 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from './CartContext';
 import DeliveryModal from './DeliveryModal';
 import './App.css';
 
 function Order() {
+    useEffect(() => {
+        document.title = "Your Order - Pronto Pizzas";
+        return () => {
+            document.title = "Pronto Pizzas"; // Reset to default
+        };
+    }, []);
     const { items, total, updateQuantity, removeFromCart, clearCart } = useCart();
     const navigate = useNavigate();
 
