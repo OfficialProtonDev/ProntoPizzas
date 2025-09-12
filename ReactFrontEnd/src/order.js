@@ -2,6 +2,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from './CartContext';
 import DeliveryModal from './DeliveryModal';
+import OrderSuccessModal from './OrderSuccessModal';
 import './App.css';
 
 function Order() {
@@ -15,7 +16,9 @@ function Order() {
     const navigate = useNavigate();
 
     const [showDeliveryModal, setShowDeliveryModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [orderSuccessData, setOrderSuccessData] = useState(null);
 
     // Handle opening the delivery modal
     const handlePlaceOrder = () => {
@@ -31,15 +34,20 @@ function Order() {
         setIsProcessing(true);
 
         try {
+            // Generate a new order ID
+            const orderId = crypto.randomUUID();
+
             // Transform cart items to match API expectations
             const orderProducts = items.map(item => ({
+                orderId: orderId,
                 pizzaId: item.pizzaId,
                 size: item.size,
                 quantity: item.quantity
             }));
 
-            // Prepare order object for API
+            // Prepare order object for API 
             const orderPayload = {
+                orderId: orderId,
                 orderDate: new Date().toISOString(),
                 customerName: orderData.customerName,
                 deliveryAddress: orderData.deliveryAddress,
@@ -47,8 +55,10 @@ function Order() {
                 orderProducts: orderProducts
             };
 
+            console.log('Sending order payload:', orderPayload);
+
             // Call the OrdersApi POST endpoint
-            const response = await fetch('/api/OrdersApi', {
+            const response = await fetch('https://localhost:7212/api/OrdersApi', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -57,25 +67,43 @@ function Order() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to place order');
+                const errorText = await response.text();
+                console.error('API Error:', errorText);
+                throw new Error(`Failed to place order: ${response.status}`);
             }
 
             const result = await response.json();
-            const orderId = result.orderId;
+            const responseOrderId = result.orderId || orderId;
 
-            // Clear cart and navigate to tracking
+            // Calculate total item count
+            const itemCount = items.reduce((total, item) => total + item.quantity, 0);
+
+            // Store success data
+            setOrderSuccessData({
+                orderId: responseOrderId,
+                customerName: orderData.customerName,
+                itemCount: itemCount
+            });
+
+            // Clear cart and close delivery modal
             clearCart();
             setShowDeliveryModal(false);
 
-            alert(`Order placed successfully! Your Order ID is: ${orderId}`);
-            navigate('/tracking');
+            // Show success modal
+            setShowSuccessModal(true);
 
         } catch (error) {
             console.error('Error placing order:', error);
-            alert('There was an error placing your order. Please try again.');
+            alert(`There was an error placing your order: ${error.message}. Please try again.`);
         } finally {
             setIsProcessing(false);
         }
+    };
+
+    // Handle closing success modal
+    const handleCloseSuccessModal = () => {
+        setShowSuccessModal(false);
+        setOrderSuccessData(null);
     };
 
     return (
@@ -87,6 +115,15 @@ function Order() {
                 onSubmit={handleOrderSubmit}
                 cartTotal={total}
                 cartItems={items}
+            />
+
+            {/* Order Success Modal */}
+            <OrderSuccessModal
+                isOpen={showSuccessModal}
+                onClose={handleCloseSuccessModal}
+                orderId={orderSuccessData?.orderId}
+                customerName={orderSuccessData?.customerName}
+                itemCount={orderSuccessData?.itemCount}
             />
 
             {/* Header */}
@@ -184,7 +221,7 @@ function Order() {
                                     disabled={isProcessing || items.length === 0}
                                     className="place-order-btn"
                                 >
-                                    Place Order - ${total.toFixed(2)}
+                                    {isProcessing ? 'Processing...' : `Place Order - $${total.toFixed(2)}`}
                                 </button>
                             </div>
                         </div>
