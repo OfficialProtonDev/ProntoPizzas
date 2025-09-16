@@ -65,13 +65,25 @@ namespace ProntoPizzas.Controllers
                 order.OrderDate = DateTime.UtcNow;
             }
 
-            // Ensure OrderProducts have the correct OrderId
+            // Ensure OrderProducts have the correct OrderId and remove duplicates
             if (order.OrderProducts != null)
             {
+                var uniqueOrderProducts = new List<OrderProduct>();
+                var seenKeys = new HashSet<(Guid OrderId, Guid PizzaId)>();
+
                 foreach (var orderProduct in order.OrderProducts)
                 {
                     orderProduct.OrderId = order.OrderId;
+                    var key = (orderProduct.OrderId, orderProduct.PizzaId);
+                    
+                    if (!seenKeys.Contains(key))
+                    {
+                        seenKeys.Add(key);
+                        uniqueOrderProducts.Add(orderProduct);
+                    }
                 }
+                
+                order.OrderProducts = uniqueOrderProducts;
             }
 
             _context.Order.Add(order);
