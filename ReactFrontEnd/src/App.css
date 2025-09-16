@@ -225,7 +225,6 @@ html {
     align-items: center;
     justify-content: center;
     background: none;
-    box-shadow: 0 10px 36px rgba(60,30,10,0.10);
     border-radius: 32px;
     padding: 0;
 }
@@ -407,7 +406,8 @@ html {
 .menu-img {
     width: 110px;
     height: 110px;
-    object-fit: contain;
+    object-fit: cover;
+    border-radius: 50%; 
     margin-bottom: 1.3rem;
     background: transparent;
     border: none;
@@ -2329,7 +2329,6 @@ html {
     z-index: 10000;
     padding: 20px;
     overflow-y: auto;
-    backdrop-filter: blur(5px);
 }
 
 .order-success-modal {

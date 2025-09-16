@@ -53,6 +53,39 @@ namespace ProntoPizzas.Controllers
         [HttpPost]
         public async Task<ActionResult<Order>> PostOrder(Order order)
         {
+            // Generate a new GUID if one wasn't provided or if it's empty
+            if (order.OrderId == Guid.Empty)
+            {
+                order.OrderId = Guid.NewGuid();
+            }
+
+            // Set OrderDate if not provided
+            if (!order.OrderDate.HasValue)
+            {
+                order.OrderDate = DateTime.UtcNow;
+            }
+
+            // Ensure OrderProducts have the correct OrderId and remove duplicates
+            if (order.OrderProducts != null)
+            {
+                var uniqueOrderProducts = new List<OrderProduct>();
+                var seenKeys = new HashSet<(Guid OrderId, Guid PizzaId)>();
+
+                foreach (var orderProduct in order.OrderProducts)
+                {
+                    orderProduct.OrderId = order.OrderId;
+                    var key = (orderProduct.OrderId, orderProduct.PizzaId);
+                    
+                    if (!seenKeys.Contains(key))
+                    {
+                        seenKeys.Add(key);
+                        uniqueOrderProducts.Add(orderProduct);
+                    }
+                }
+                
+                order.OrderProducts = uniqueOrderProducts;
+            }
+
             _context.Order.Add(order);
             await _context.SaveChangesAsync();
 

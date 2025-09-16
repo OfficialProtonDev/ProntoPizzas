@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from "react-router-dom";
 import './App.css';
 
@@ -7,6 +7,8 @@ function Tracking() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [orderData, setOrderData] = useState(null);
+    const [isPolling, setIsPolling] = useState(false);
+    const pollingIntervalRef = useRef(null);
     const location = useLocation();
 
     const trackOrder = async (orderIdToTrack) => {
@@ -53,6 +55,41 @@ function Tracking() {
         }
     };
 
+    // Polling function to check for updates
+    const pollForUpdates = async (orderIdToPoll) => {
+        try {
+            const response = await fetch(`https://localhost:7212/api/OrdersApi/${orderIdToPoll}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const transformedData = {
+                    orderId: data.orderId,
+                    customerName: data.customerName,
+                    deliveryAddress: data.deliveryAddress,
+                    orderStatus: data.orderStatus,
+                    orderDate: data.orderDate,
+                    items: data.orderProducts || []
+                };
+                
+                setOrderData(prevData => {
+                    // Only update if status has changed
+                    if (!prevData || prevData.orderStatus !== transformedData.orderStatus) {
+                        console.log('Order status updated:', transformedData.orderStatus);
+                        return transformedData;
+                    }
+                    return prevData;
+                });
+            }
+        } catch (error) {
+            console.error('Error polling for updates:', error);
+        }
+    };
+
     useEffect(() => {
         document.title = "Order Tracking - Pronto Pizzas";
         return () => {
@@ -74,6 +111,32 @@ function Tracking() {
         }
     }, [location.search]);
 
+    // Start polling when order is loaded
+    useEffect(() => {
+        if (orderData?.orderId && !isPolling) {
+            setIsPolling(true);
+            pollingIntervalRef.current = setInterval(() => {
+                pollForUpdates(orderData.orderId);
+            }, 10000); // Poll every 10 seconds
+        }
+
+        return () => {
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+                setIsPolling(false);
+            }
+        };
+    }, [orderData?.orderId]);
+
+    // Stop polling when component unmounts or order changes
+    useEffect(() => {
+        return () => {
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+            }
+        };
+    }, []);
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -93,7 +156,7 @@ function Tracking() {
     };
 
     const getStatusStep = (status) => {
-        const statuses = ['preparing', 'baking', 'ready', 'delivering', 'delivered'];
+        const statuses = ['preparing', 'baking', 'delivering', 'delivered'];
         return statuses.indexOf(status?.toLowerCase()) + 1;
     };
 
@@ -101,9 +164,9 @@ function Tracking() {
         const statusMap = {
             'preparing': 'Preparing your order',
             'baking': 'Baking in the oven',
-            'ready': 'Ready for pickup/delivery',
             'delivering': 'Out for delivery',
-            'delivered': 'Delivered'
+            'delivered': 'Delivered',
+            'canceled': 'Order Canceled'
         };
         return statusMap[status?.toLowerCase()] || status;
     };
@@ -112,9 +175,9 @@ function Tracking() {
         const iconMap = {
             'preparing': '👨‍🍳',
             'baking': '🔥',
-            'ready': '✅',
             'delivering': '🚗',
-            'delivered': '🏠'
+            'delivered': '🏠',
+            'canceled': '❌'
         };
         
         if (isCompleted) return '✓';
@@ -137,6 +200,63 @@ function Tracking() {
     const calculateOrderTotal = (items) => {
         // Since we don't have prices in the order items, we'll show item count instead
         return items.reduce((total, item) => total + item.quantity, 0);
+    };
+
+    const renderTrackingTimeline = () => {
+        const currentStatus = orderData.orderStatus?.toLowerCase();
+        
+        // If order is canceled, show special canceled timeline
+        if (currentStatus === 'canceled') {
+            return (
+                <div className="tracking-timeline canceled">
+                    <div className="timeline-step canceled-step">
+                        <div className="timeline-indicator">
+                            <div className="timeline-icon">❌</div>
+                        </div>
+                        <div className="timeline-content">
+                            <h4>Order Canceled</h4>
+                            <p className="timeline-description">
+                                This order has been canceled. If you have any questions, please contact customer service.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Normal tracking timeline (without 'ready' status)
+        return (
+            <div className="tracking-timeline">
+                {['preparing', 'baking', 'delivering', 'delivered'].map((status, index) => {
+                    const currentStep = getStatusStep(orderData.orderStatus);
+                    const isCompleted = currentStep > index + 1;
+                    const isActive = currentStep === index + 1;
+                    
+                    return (
+                        <div
+                            key={status}
+                            className={`timeline-step ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}`}
+                        >
+                            <div className="timeline-indicator">
+                                <div className="timeline-icon">
+                                    {getStatusIcon(status, isActive, isCompleted)}
+                                </div>
+                                {index < 3 && <div className="timeline-line"></div>}
+                            </div>
+                            <div className="timeline-content">
+                                <h4>{getStatusDisplay(status)}</h4>
+                                <p className="timeline-description">
+                                    {status === 'preparing' && 'Our chefs are carefully preparing your order'}
+                                    {status === 'baking' && 'Your pizza is baking to perfection in our wood-fired oven'}
+                                    {status === 'delivering' && 'Your order is on its way to you'}
+                                    {status === 'delivered' && 'Your order has been delivered. Enjoy!'}
+                                </p>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        );
     };
 
     return (
@@ -222,47 +342,17 @@ function Tracking() {
                     {orderData && (
                         <div className="tracking-results">
                             {/* Order Status Card */}
-                            <div className="tracking-status-card">
+                            <div className={`tracking-status-card ${orderData.orderStatus?.toLowerCase() === 'canceled' ? 'canceled-order' : ''}`}>
                                 <div className="status-header">
                                     <h2>📦 Order Status</h2>
-                                    <div className="status-badge">
+                                    <div className={`status-badge ${orderData.orderStatus?.toLowerCase() === 'canceled' ? 'canceled' : ''}`}>
                                         <span className="status-indicator"></span>
                                         {getStatusDisplay(orderData.orderStatus)}
                                     </div>
                                 </div>
 
                                 {/* Progress Timeline */}
-                                <div className="tracking-timeline">
-                                    {['preparing', 'baking', 'ready', 'delivering', 'delivered'].map((status, index) => {
-                                        const currentStep = getStatusStep(orderData.orderStatus);
-                                        const isCompleted = currentStep > index + 1;
-                                        const isActive = currentStep === index + 1;
-                                        
-                                        return (
-                                            <div
-                                                key={status}
-                                                className={`timeline-step ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}`}
-                                            >
-                                                <div className="timeline-indicator">
-                                                    <div className="timeline-icon">
-                                                        {getStatusIcon(status, isActive, isCompleted)}
-                                                    </div>
-                                                    {index < 4 && <div className="timeline-line"></div>}
-                                                </div>
-                                                <div className="timeline-content">
-                                                    <h4>{getStatusDisplay(status)}</h4>
-                                                    <p className="timeline-description">
-                                                        {status === 'preparing' && 'Our chefs are carefully preparing your order'}
-                                                        {status === 'baking' && 'Your pizza is baking to perfection in our wood-fired oven'}
-                                                        {status === 'ready' && 'Your order is ready and being packaged'}
-                                                        {status === 'delivering' && 'Your order is on its way to you'}
-                                                        {status === 'delivered' && 'Your order has been delivered. Enjoy!'}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                {renderTrackingTimeline()}
                             </div>
 
                             {/* Order Information Grid */}
@@ -304,7 +394,9 @@ function Tracking() {
                                         </div>
                                         <div className="info-row">
                                             <span className="info-label">Status:</span>
-                                            <span className="info-value status-text">{orderData.orderStatus}</span>
+                                            <span className={`info-value status-text ${orderData.orderStatus?.toLowerCase() === 'canceled' ? 'canceled' : ''}`}>
+                                                {orderData.orderStatus}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
