@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from "react-router-dom";
 import './App.css';
 
@@ -7,6 +7,8 @@ function Tracking() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [orderData, setOrderData] = useState(null);
+    const [isPolling, setIsPolling] = useState(false);
+    const pollingIntervalRef = useRef(null);
     const location = useLocation();
 
     const trackOrder = async (orderIdToTrack) => {
@@ -53,6 +55,41 @@ function Tracking() {
         }
     };
 
+    // Polling function to check for updates
+    const pollForUpdates = async (orderIdToPoll) => {
+        try {
+            const response = await fetch(`https://localhost:7212/api/OrdersApi/${orderIdToPoll}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const transformedData = {
+                    orderId: data.orderId,
+                    customerName: data.customerName,
+                    deliveryAddress: data.deliveryAddress,
+                    orderStatus: data.orderStatus,
+                    orderDate: data.orderDate,
+                    items: data.orderProducts || []
+                };
+                
+                setOrderData(prevData => {
+                    // Only update if status has changed
+                    if (!prevData || prevData.orderStatus !== transformedData.orderStatus) {
+                        console.log('Order status updated:', transformedData.orderStatus);
+                        return transformedData;
+                    }
+                    return prevData;
+                });
+            }
+        } catch (error) {
+            console.error('Error polling for updates:', error);
+        }
+    };
+
     useEffect(() => {
         document.title = "Order Tracking - Pronto Pizzas";
         return () => {
@@ -73,6 +110,32 @@ function Tracking() {
             trackOrder(urlOrderId);
         }
     }, [location.search]);
+
+    // Start polling when order is loaded
+    useEffect(() => {
+        if (orderData?.orderId && !isPolling) {
+            setIsPolling(true);
+            pollingIntervalRef.current = setInterval(() => {
+                pollForUpdates(orderData.orderId);
+            }, 10000); // Poll every 10 seconds
+        }
+
+        return () => {
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+                setIsPolling(false);
+            }
+        };
+    }, [orderData?.orderId]);
+
+    // Stop polling when component unmounts or order changes
+    useEffect(() => {
+        return () => {
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+            }
+        };
+    }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
